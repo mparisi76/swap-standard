@@ -1,0 +1,182 @@
+import { directus } from "@/lib/directus";
+import { readItem } from "@directus/sdk";
+import { Asset } from "@/types/schema";
+import Link from "next/link";
+import { ArrowLeft, Tag, Clock } from "lucide-react";
+import { notFound } from "next/navigation";
+import { type Metadata } from "next";
+import AssetGallery from "@/components/explore/AssetGallery";
+import RecentViewTracker from "@/components/explore/RecentViewTracker";
+import RecentlyViewed from "@/components/explore/RecentlyViewed";
+
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+
+const FIELDS = [
+  "id",
+  "title",
+  "offering",
+  "seeking",
+  "type",
+  "asset_status",
+  "location_label",
+  "thumbnail",
+  "image_gallery.directus_files_id",
+  "date_created",
+] as unknown as (keyof Asset)[];
+
+async function fetchAsset(id: string): Promise<Asset | null> {
+  try {
+    const response = await directus.request(
+      readItem("assets", id, { fields: FIELDS }),
+    );
+    return response ? (response as unknown as Asset) : null;
+  } catch {
+    return null;
+  }
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}): Promise<Metadata> {
+  const { id } = await params;
+  const asset = await fetchAsset(id);
+
+  if (!asset) return { title: "Asset Not Found" };
+
+  const description = asset.offering
+    ? asset.offering.slice(0, 155).trimEnd() + (asset.offering.length > 155 ? "…" : "")
+    : `${asset.type} available on SwapStandard.`;
+
+  const ogImage = asset.thumbnail
+    ? `${DIRECTUS_URL}/assets/${asset.thumbnail}?width=1200&height=630&fit=cover&quality=85`
+    : undefined;
+
+  return {
+    title: asset.title,
+    description,
+    openGraph: {
+      title: asset.title,
+      description,
+      type: "article",
+      ...(asset.location_label && { locale: asset.location_label }),
+      ...(ogImage && { images: [{ url: ogImage, width: 1200, height: 630 }] }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: asset.title,
+      description,
+      ...(ogImage && { images: [ogImage] }),
+    },
+  };
+}
+
+export default async function AssetDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
+
+  const asset = await fetchAsset(id);
+  if (!asset) notFound();
+
+  return (
+    <main className="min-h-screen bg-[#F9F8F6] pb-20">
+      <RecentViewTracker assetId={id} />
+
+      <div className="border-b-2 border-zinc-900 bg-white sticky top-18 z-30">
+        <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
+          <Link
+            href="/explore"
+            className="flex items-center gap-2 text-label font-bold uppercase tracking-widest text-zinc-900 hover:text-emerald-700 transition-colors"
+          >
+            <ArrowLeft size={16} strokeWidth={2.5} />
+            Registry Index
+          </Link>
+          <span className="font-mono text-label text-zinc-400">
+            REF—{String(asset.id).padStart(6, "0")}
+          </span>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 py-12">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
+          <div className="md:col-span-5 space-y-8">
+            <AssetGallery
+              thumbnail={asset.thumbnail as string}
+              photo_gallery={asset.image_gallery}
+              name={asset.title}
+              isSold={asset.asset_status !== "available"}
+            />
+          </div>
+
+          <div className="md:col-span-7 space-y-10">
+            <header>
+              <span className="text-label font-black uppercase text-emerald-700 tracking-[0.2em] block mb-2">
+                {asset.asset_status || "Available"}
+              </span>
+              <h1 className="text-header font-black uppercase italic leading-tight text-zinc-900 border-b-4 border-zinc-900 pb-6">
+                {asset.title}
+              </h1>
+
+              <div className="flex gap-10 pt-6">
+                <div className="flex items-center gap-4">
+                  <Tag size={18} className="text-zinc-400" />
+                  <div className="flex flex-col">
+                    <span className="text-label font-black uppercase text-zinc-400 leading-none">
+                      Category
+                    </span>
+                    <span className="text-body font-bold text-zinc-900 uppercase">
+                      {asset.type || "General"}
+                    </span>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <Clock size={18} className="text-zinc-400" />
+                  <div className="flex flex-col">
+                    <span className="text-label font-black uppercase text-zinc-400 leading-none">
+                      Logged Date
+                    </span>
+                    <span className="text-body font-bold text-zinc-900 uppercase">
+                      {new Date(asset.date_created).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </header>
+
+            <div className="space-y-8">
+              <div className="space-y-2">
+                <label className="text-label font-black uppercase text-zinc-400">
+                  I&apos;m offering:
+                </label>
+                <p className="text-body text-zinc-900 leading-relaxed">
+                  {asset.offering || "—"}
+                </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-label font-black uppercase text-zinc-400">
+                  I&apos;m needing:
+                </label>
+                <p className="text-body font-bold text-zinc-900 leading-relaxed border-l-4 border-emerald-600 pl-6">
+                  {asset.seeking || "—"}
+                </p>
+              </div>
+            </div>
+
+            <div className="pt-6">
+              <button className="w-full bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+                Initiate Exchange
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <RecentlyViewed currentId={id} />
+    </main>
+  );
+}

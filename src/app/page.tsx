@@ -1,65 +1,113 @@
-import Image from "next/image";
+import Link from "next/link";
+import { directus } from "@/lib/directus";
+import { readItems } from "@directus/sdk";
+import { Asset } from "@/types/schema";
+import AnimatedSection from "@/components/layout/AnimatedSection";
 
-export default function Home() {
+export const revalidate = 0;
+
+export default async function HomePage() {
+  const assets = await directus.request<Asset[]>(
+    readItems("assets", {
+      filter: { asset_status: { _eq: "available" } },
+      fields: ["id", "title", "offering", "seeking", "type", "asset_status"],
+    }),
+  );
+
+  const sharedCount = assets.filter((a) => a.offering).length;
+  const seekingCount = assets.filter((a) => a.seeking).length;
+
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+    <main className="min-h-[calc(100vh-80px)] bg-[#F9F8F6] py-20 px-6 font-serif">
+      <div className="max-w-3xl mx-auto">
+        <AnimatedSection delay={0.1}>
+          <section className="mb-16">
+            <h1 className="text-[calc(var(--text-header-size)*2.5)] md:text-[calc(var(--text-header-size)*3)] font-bold text-zinc-900 leading-tight mb-6">
+              Stronger Together.
+            </h1>
+            <p className="text-[calc(var(--text-body-size)*1.25)] text-zinc-600 leading-relaxed max-w-2xl italic">
+              SwapStandard is a stewardship registry built on the duty of care.
+              We believe in direct exchange as a way to look out for our fellow
+              humans. Find what you need, share what you can, and build a
+              network of mutual resilience.
+            </p>
+          </section>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.2}>
+          <section className="mb-12">
+            <div className="flex flex-col gap-2">
+              <label className="text-label font-bold uppercase tracking-widest text-zinc-500 ml-2">
+                Search the local exchange
+              </label>
+              <div className="flex border-4 border-zinc-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                <input
+                  type="text"
+                  placeholder="How can you help today?"
+                  className="flex-1 px-6 py-5 text-body outline-none placeholder:text-zinc-400"
+                />
+                <button className="px-10 py-5 bg-zinc-900 text-white font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all text-label">
+                  Search
+                </button>
+              </div>
+            </div>
+          </section>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.3}>
+          <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
+            <Link
+              href="/dashboard/offer"
+              className="border-4 border-zinc-900 p-8 hover:bg-zinc-100 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
+              <span className="block text-header font-bold text-zinc-900 mb-2">
+                Share a Resource
+              </span>
+              <span className="text-zinc-600 italic text-detail">
+                Register tools, skills, or surplus to support your community.
+              </span>
+            </Link>
+            <Link
+              href="/explore"
+              className="border-4 border-zinc-200 p-8 hover:border-zinc-900 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+              <span className="block text-header font-bold text-zinc-900 mb-2">
+                Identify a Need
+              </span>
+              <span className="text-zinc-600 italic text-detail">
+                Browse what others require and offer your support.
+              </span>
+            </Link>
+          </section>
+        </AnimatedSection>
+
+        <AnimatedSection delay={0.4}>
+          <section className="flex flex-wrap gap-12 pt-8 border-t-2 border-zinc-200">
+            <div>
+              <p className="text-[calc(var(--text-header-size)*2)] font-black text-zinc-900">
+                {sharedCount}
+              </p>
+              <p className="text-label font-bold uppercase tracking-widest text-zinc-500">
+                Community Assets
+              </p>
+            </div>
+            <div>
+              <p className="text-[calc(var(--text-header-size)*2)] font-black text-zinc-900">
+                {seekingCount}
+              </p>
+              <p className="text-label font-bold uppercase tracking-widest text-zinc-500">
+                Ways to Help
+              </p>
+            </div>
+            <div className="md:ml-auto">
+              <p className="text-detail italic text-zinc-500 max-w-50">
+                &ldquo;The duty of care is the foundation of our local
+                strength.&rdquo;
+              </p>
+            </div>
+          </section>
+        </AnimatedSection>
+      </div>
+    </main>
   );
 }
