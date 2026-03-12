@@ -1,4 +1,5 @@
 import { Suspense } from "react";
+import { type Metadata } from "next";
 import AssetCard from "@/components/explore/AssetCard";
 import { getAssets } from "@/services/(public)/assets";
 import EmptyState from "@/components/shared/EmptyState";
@@ -6,6 +7,23 @@ import ControlBar from "@/components/explore/ControlBar";
 import LocationInterstitial from "@/components/explore/LocationInterstitial";
 import { AssetFeedSkeleton } from "@/components/explore/AssetCardSkeleton";
 import Pagination from "@/components/explore/Pagination";
+
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com";
+
+export const metadata: Metadata = {
+  title: "Explore the Exchange",
+  description:
+    "Browse tools, skills, and services available for direct exchange in your community. Find what you need or offer what you have.",
+  alternates: {
+    canonical: `${SITE_URL}/explore`,
+  },
+  openGraph: {
+    title: "Explore the Exchange | SwapStandard",
+    description:
+      "Browse tools, skills, and services available for direct exchange in your community.",
+    url: `${SITE_URL}/explore`,
+  },
+};
 
 interface ExploreParams {
   page?: string;
@@ -39,7 +57,7 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
 
   return (
     <>
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         {items.map((item) => (
           <AssetCard key={item.id} asset={item} />
         ))}

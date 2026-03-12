@@ -1,9 +1,22 @@
+import { type Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { directus } from "@/lib/directus";
 import { readItems } from "@directus/sdk";
 import { Asset } from "@/types/schema";
 import AnimatedSection from "@/components/layout/AnimatedSection";
+
+export const metadata: Metadata = {
+  title: "SwapStandard — Stronger Together",
+  description:
+    "A stewardship registry built on the duty of care. Share what you have, find what you need, and build a network of mutual resilience through direct exchange.",
+  openGraph: {
+    title: "SwapStandard — Stronger Together",
+    description:
+      "Share what you have, find what you need. Direct exchange. Mutual resilience.",
+    url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com",
+  },
+};
 
 export const revalidate = 0;
 

@@ -91,8 +91,33 @@ export default async function AssetDetailPage({
   const isLoggedIn = !!auth;
   const isOwner = !!auth && asset.user_created === auth.userId;
 
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com";
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: asset.title,
+    description: asset.offering ?? undefined,
+    ...(asset.thumbnail && {
+      image: `${DIRECTUS_URL}/assets/${asset.thumbnail}?width=1200&height=630&fit=cover`,
+    }),
+    url: `${siteUrl}/explore/${asset.id}`,
+    datePublished: asset.date_created,
+    offers: {
+      "@type": "Offer",
+      availability: asset.asset_status === "available"
+        ? "https://schema.org/InStock"
+        : "https://schema.org/OutOfStock",
+      price: "0",
+      priceCurrency: "USD",
+    },
+  };
+
   return (
     <main className="min-h-screen bg-[#F9F8F6] pb-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       <RecentViewTracker assetId={id} />
 
       <div className="border-b-2 border-zinc-900 bg-white sticky top-18 z-30">
@@ -102,7 +127,7 @@ export default async function AssetDetailPage({
             className="flex items-center gap-2 text-label font-bold uppercase tracking-widest text-zinc-900 hover:text-emerald-700 transition-colors"
           >
             <ArrowLeft size={16} strokeWidth={2.5} />
-            Registry Index
+            Explore
           </Link>
           <span className="font-mono text-label text-zinc-400">
             REF—{String(asset.id).padStart(6, "0")}
@@ -168,7 +193,7 @@ export default async function AssetDetailPage({
 
               <div className="space-y-2">
                 <label className="text-label font-black uppercase text-zinc-400">
-                  I&apos;m needing:
+                  I&apos;m seeking:
                 </label>
                 <p className="text-body font-bold text-zinc-900 leading-relaxed border-l-4 border-emerald-600 pl-6">
                   {asset.seeking || "—"}

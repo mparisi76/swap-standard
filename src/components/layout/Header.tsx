@@ -44,7 +44,7 @@ export default function Header({ user }: { user?: User | null }) {
           href="/"
           className="text-header font-black uppercase tracking-tighter text-zinc-900 hover:text-emerald-700 transition-colors"
         >
-          <span className="flex items-center leading-none tracking-tight">
+          <span className="flex items-center leading-0 tracking-tight">
             <span className="text-[2.25em] font-black">S</span>
             <span className="flex flex-col leading-[.8] ml-0">
               <span>wap</span>

@@ -2,9 +2,10 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy } from "lucide-react";
+import { Copy, Trash2 } from "lucide-react";
 import { Asset } from "@/types/schema";
 import { duplicateAssetAction } from "@/app/actions/assets/duplicate";
+import { deleteAssetAction } from "@/app/actions/assets/delete";
 import AssetStatusSelect from "./AssetStatusSelect";
 import PublishStatusSelect from "./PublishStatusSelect";
 
@@ -131,6 +132,17 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                       View →
                     </Link>
                   )}
+                  <form action={deleteAssetAction}>
+                    <input type="hidden" name="assetId" value={item.id} />
+                    <button
+                      type="submit"
+                      title="Delete"
+                      onClick={(e) => { if (!confirm(`Delete "${item.title}"?`)) e.preventDefault(); }}
+                      className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </form>
                 </div>
               </div>
 
@@ -161,6 +173,17 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                   <input type="hidden" name="assetId" value={item.id} />
                   <button type="submit" title="Duplicate" className="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer">
                     <Copy size={14} />
+                  </button>
+                </form>
+                <form action={deleteAssetAction}>
+                  <input type="hidden" name="assetId" value={item.id} />
+                  <button
+                    type="submit"
+                    title="Delete"
+                    onClick={(e) => { if (!confirm(`Delete "${item.title}"?`)) e.preventDefault(); }}
+                    className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </form>
               </div>

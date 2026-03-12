@@ -44,9 +44,6 @@ export default async function MoreFromMember({
   return (
     <section className="max-w-5xl mx-auto px-6 mt-12 border-t-2 border-zinc-900 pt-16 pb-8">
       <div className="mb-10">
-        <span className="text-label font-black uppercase tracking-[0.4em] text-zinc-400 block mb-2">
-          Same Steward
-        </span>
         <h2 className="text-header font-bold uppercase tracking-tighter text-zinc-900 italic">
           More from this Member
         </h2>

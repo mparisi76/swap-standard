@@ -141,7 +141,7 @@ export default function NewAssetForm() {
           htmlFor="seeking"
           className="text-label font-black uppercase tracking-widest text-zinc-400 block"
         >
-          I&apos;m needing
+          I&apos;m seeking
         </label>
         <p className="text-detail text-zinc-500 italic">
           What would make this a fair exchange for you?

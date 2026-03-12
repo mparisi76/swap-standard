@@ -32,7 +32,7 @@ export default function SearchBar() {
     <form 
       onSubmit={handleSearch}
       key={initialValue} // This forces the input to reset if the URL changes externally
-      className="flex h-[38px] border-2 border-zinc-900 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all focus-within:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+      className="flex h-9.5 border-2 border-zinc-900 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all focus-within:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
     >
       <div className="flex items-center px-3 text-zinc-400">
         {/* Hard-locked size so the icon doesn't scale with text */}

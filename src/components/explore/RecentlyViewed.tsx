@@ -68,11 +68,8 @@ export default function RecentlyViewed({ currentId }: { currentId: string }) {
     <section className="max-w-5xl mx-auto px-6 mt-12 border-t-2 border-zinc-900 pt-16 pb-20">
       <div className="flex justify-between items-end mb-10">
         <div>
-          <span className="text-label font-black uppercase tracking-[0.4em] text-zinc-400 block mb-2">
-            Viewed Recently
-          </span>
           <h2 className="text-header font-bold uppercase tracking-tighter text-zinc-900 italic">
-            Registry History
+            Recently Viewed
           </h2>
         </div>
 
