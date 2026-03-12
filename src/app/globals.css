@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
+  --background: #F9F8F6;
   --foreground: #171717;
   --text-label-size: 0.75rem;
   --text-detail-size: 0.875rem;
@@ -22,15 +22,14 @@
 .text-body { font-size: var(--text-body-size); }
 .text-header { font-size: var(--text-header-size); }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+
+html {
+  min-width: 360px;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: sans-serif;
+  min-width: 360px;
 }

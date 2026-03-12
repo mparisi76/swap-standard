@@ -1,6 +1,7 @@
 "use server";
 
 import { redirect } from "next/navigation";
+import { verifyTurnstile } from "@/utils/turnstile";
 import {
   createDirectus,
   rest,
@@ -34,6 +35,11 @@ export async function registerAction(
   prevState: AuthResponse,
   formData: FormData,
 ): Promise<AuthResponse> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string;
+  if (!turnstileToken || !(await verifyTurnstile(turnstileToken))) {
+    return { error: "Human verification failed. Please try again." };
+  }
+
   const email = (formData.get("email") as string).toLowerCase().trim();
   const firstName = formData.get("firstName") as string;
   const lastName = formData.get("lastName") as string;

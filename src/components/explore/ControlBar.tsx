@@ -1,9 +1,9 @@
 "use client";
 
 import { Suspense } from "react";
-import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import SearchBar from "@/components/explore/SearchBar";
 import FilterBar from "@/components/explore/FilterBar";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
@@ -25,41 +25,35 @@ function RadiusFilter() {
   };
 
   return (
-    <div className="border-t border-zinc-200 pt-2 pb-1 flex items-center gap-3">
-      <span className="text-label font-black uppercase tracking-widest text-zinc-400 shrink-0">
+    <div className="flex w-full lg:w-auto lg:shrink-0 lg:items-center lg:gap-2">
+      <span className="hidden lg:block text-label font-black uppercase tracking-widest text-zinc-400 shrink-0">
         Within:
       </span>
-      <div className="flex gap-1">
-        {RADIUS_OPTIONS.map((r) => (
-          <button
-            key={r}
-            onClick={() => handleRadius(r)}
-            className={`text-label font-black uppercase tracking-wider px-3 py-1.5 border-2 transition-all cursor-pointer
-              ${currentRadius === r
-                ? "bg-zinc-900 text-white border-zinc-900 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-100"
-              }`}
-          >
-            {r}mi
-          </button>
-        ))}
-      </div>
+      {RADIUS_OPTIONS.map((r) => (
+        <button
+          key={r}
+          onClick={() => handleRadius(r)}
+          className={`flex-1 lg:flex-none text-label font-black uppercase tracking-wider px-3 py-2 border-2 transition-all cursor-pointer
+            ${currentRadius === r
+              ? "bg-zinc-900 text-white border-zinc-900"
+              : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-100"
+            }`}
+        >
+          {r}mi
+        </button>
+      ))}
     </div>
   );
 }
 
 export default function ControlBar() {
   return (
-    <div className="sticky top-18.25 z-40 bg-[#F9F8F6] border-b border-zinc-200 py-2 shadow-sm">
-      <div className="max-w-400 mx-auto px-6">
-        <div className="flex items-center gap-6">
-          <div className="flex-1">
-            <SearchBar />
-          </div>
-          <div className="shrink-0">
-            <FilterBar />
-          </div>
+    <div className="sticky top-18.25 z-40 bg-[#F9F8F6] border-b border-zinc-200 shadow-sm">
+      <div className="py-3 px-4 lg:px-6 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
+        <div className="lg:flex-1">
+          <SearchBar />
         </div>
+        <FilterBar />
         <Suspense fallback={null}>
           <RadiusFilter />
         </Suspense>

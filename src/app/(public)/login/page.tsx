@@ -4,6 +4,7 @@ import { useActionState, Suspense, useEffect } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/actions/auth/login";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
@@ -76,6 +77,11 @@ function LoginForm() {
             className="w-full border-2 border-zinc-900 px-4 py-3 outline-none text-sm bg-zinc-50 font-bold text-zinc-900"
           />
         </div>
+
+        <Turnstile
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          options={{ theme: "light" }}
+        />
 
         <button
           disabled={isPending}

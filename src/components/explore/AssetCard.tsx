@@ -19,9 +19,9 @@ export default function AssetCard({ asset }: { asset: Asset }) {
   return (
     <Link
       href={`/explore/${asset.id}`}
-      className={`group flex flex-col border-[3px] bg-white p-5 transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+      className={`group flex flex-col border-2 border-zinc-900 bg-white p-5 transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
         ${!isActive ? "opacity-60" : ""}
-        ${isSwap && isActive ? "border-emerald-600" : "border-zinc-900"}`}
+        ${isSwap && isActive ? "border-l-4 border-l-emerald-600" : ""}`}
     >
       {/* 1. Header: Category Badge & Metadata Cluster */}
       <div className="flex justify-between items-start mb-3">

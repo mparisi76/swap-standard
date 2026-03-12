@@ -57,7 +57,7 @@ export default async function HomePage() {
         <AnimatedSection delay={0.3}>
           <section className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-16">
             <Link
-              href="/dashboard/offer"
+              href="/dashboard/asset/new"
               className="border-4 border-zinc-900 p-8 hover:bg-zinc-100 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
               <span className="block text-header font-bold text-zinc-900 mb-2">
@@ -69,7 +69,7 @@ export default async function HomePage() {
             </Link>
             <Link
               href="/explore"
-              className="border-4 border-zinc-200 p-8 hover:border-zinc-900 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
+              className="border-4 border-zinc-900 p-8 hover:bg-zinc-100 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
               <span className="block text-header font-bold text-zinc-900 mb-2">
                 Identify a Need

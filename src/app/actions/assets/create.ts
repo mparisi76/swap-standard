@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { isBot } from "@/utils/honeypot";
 
 export type AssetFormState = {
   error?: string;
@@ -15,6 +16,8 @@ export async function createAssetAction(
   const cookieStore = await cookies();
   const token = cookieStore.get("directus_session")?.value;
   if (!token) return { error: "Not authenticated. Please log in." };
+
+  if (isBot(formData)) return null;
 
   const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 

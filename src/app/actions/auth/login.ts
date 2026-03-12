@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { verifyTurnstile } from "@/utils/turnstile";
 
 export type AuthState = { error?: string } | null;
 
@@ -9,11 +10,13 @@ export async function loginAction(
   prevState: AuthState,
   formData: FormData
 ): Promise<AuthState> {
+  const turnstileToken = formData.get("cf-turnstile-response") as string;
+  if (!turnstileToken || !(await verifyTurnstile(turnstileToken))) {
+    return { error: "Human verification failed. Please try again." };
+  }
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
-
-  console.log("Attempting login to:", process.env.NEXT_PUBLIC_DIRECTUS_URL);
-  console.log("Email being sent:", email);
 
   try {
     const res = await fetch(`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/auth/login`, {
@@ -29,8 +32,8 @@ export async function loginAction(
     const cookieStore = await cookies();
     const cookieOpts = {
       httpOnly: true,
-      secure: false,
-      sameSite: "lax" as const,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "strict" as const,
       path: "/",
       maxAge: 60 * 60 * 24 * 7,
     };

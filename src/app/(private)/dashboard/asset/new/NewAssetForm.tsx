@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { createAssetAction, type AssetFormState } from "@/app/actions/assets/create";
 import { lookupZipCode } from "@/utils/geo";
+import HoneypotField from "@/components/shared/HoneypotField";
 import { Loader, MapPin, CheckCircle } from "lucide-react";
 import PhotoUploader from "@/components/assets/PhotoUploader";
 
@@ -44,9 +45,11 @@ export default function NewAssetForm() {
   };
 
   const fieldError = (field: string) => state?.fieldErrors?.[field];
+  const isValid = title.trim().length > 0 && offering.trim().length > 0 && seeking.trim().length > 0;
 
   return (
     <form action={action} className="space-y-10">
+      <HoneypotField />
 
       {/* Global error */}
       {state?.error && (
@@ -223,7 +226,7 @@ export default function NewAssetForm() {
           type="submit"
           name="submitType"
           value="draft"
-          disabled={pending}
+          disabled={pending || !isValid}
           className="flex-1 border-2 border-zinc-900 bg-white text-zinc-900 font-black uppercase tracking-[0.2em] py-5 text-label hover:bg-zinc-100 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
         >
           {pending ? (
@@ -238,7 +241,7 @@ export default function NewAssetForm() {
           type="submit"
           name="submitType"
           value="publish"
-          disabled={pending}
+          disabled={pending || !isValid}
           className="flex-[2] bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
         >
           {pending ? (

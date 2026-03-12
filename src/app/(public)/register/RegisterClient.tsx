@@ -3,6 +3,7 @@
 import { useActionState } from "react";
 import Link from "next/link";
 import { registerAction } from "@/app/actions/auth/register";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export default function RegisterClient() {
   const [state, formAction, isPending] = useActionState(registerAction, null);
@@ -29,6 +30,11 @@ export default function RegisterClient() {
         )}
 
         {/* ... (Keep your existing grid and input fields here as they are) ... */}
+
+        <Turnstile
+          siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+          options={{ theme: "light" }}
+        />
 
         <div className="pt-4">
           <button

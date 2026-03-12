@@ -4,6 +4,8 @@ import { getAssets } from "@/services/(public)/assets";
 import EmptyState from "@/components/shared/EmptyState";
 import ControlBar from "@/components/explore/ControlBar";
 import LocationInterstitial from "@/components/explore/LocationInterstitial";
+import { AssetFeedSkeleton } from "@/components/explore/AssetCardSkeleton";
+import Pagination from "@/components/explore/Pagination";
 
 interface ExploreParams {
   page?: string;
@@ -23,7 +25,7 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
   const userLng = params.lng ? parseFloat(params.lng) : undefined;
   const radius = params.radius ? parseFloat(params.radius) : 10;
 
-  const { data: items } = await getAssets({
+  const { data: items, meta } = await getAssets({
     type: params.type || "all",
     search: searchTerm,
     page: currentPage,
@@ -37,16 +39,19 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
 
   return (
     <>
-      {/* Reduced grid density: From 6 columns to a max of 3 or 4 */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {items.map((item) => (
           <AssetCard key={item.id} asset={item} />
         ))}
       </div>
 
-      <div className="py-12 border-t border-zinc-200 mt-12">
-        {/* Pagination logic */}
-      </div>
+      <Suspense fallback={null}>
+        <Pagination
+          currentPage={currentPage}
+          totalCount={meta.filter_count}
+          pageSize={itemsPerPage}
+        />
+      </Suspense>
     </>
   );
 }
@@ -59,7 +64,7 @@ export default async function ExplorePage({
   const params = await searchParams;
 
   return (
-    <main className="bg-[#F9F8F6] min-h-screen">
+    <main className="bg-[#F9F8F6]">
       <Suspense fallback={null}>
         <LocationInterstitial />
       </Suspense>
@@ -72,14 +77,10 @@ export default async function ExplorePage({
         </div> */}
 
         {/* Content feed follows */}
-        <div className="min-h-[60vh]">
+        <div>
           <Suspense
             key={JSON.stringify(params)}
-            fallback={
-              <div className="p-10 text-detail font-mono uppercase text-zinc-400 animate-pulse">
-                Synchronizing registry...
-              </div>
-            }
+            fallback={<AssetFeedSkeleton />}
           >
             <ResourceFeed params={params} />
           </Suspense>

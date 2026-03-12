@@ -18,6 +18,7 @@ export interface Asset {
   thumbnail: string | null;
   image_gallery: GalleryItem[];
   date_created: string;
+  user_created?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   location_label?: string | null;
@@ -27,4 +28,32 @@ export interface Asset {
 
 export interface SwapSchema {
   assets: Asset[];
+  exchanges: Exchange[];
+  exchange_messages: ExchangeMessage[];
+}
+
+export type ExchangeStatus = 'pending' | 'active' | 'completed' | 'declined';
+
+export interface ExchangeUser {
+  id: string;
+  first_name: string | null;
+  last_name: string | null;
+}
+
+export interface Exchange {
+  id: number;
+  status: ExchangeStatus;
+  asset: Pick<Asset, 'id' | 'title' | 'type' | 'thumbnail' | 'asset_status'>;
+  initiator: ExchangeUser;
+  owner: ExchangeUser;
+  date_created: string;
+  date_updated: string;
+}
+
+export interface ExchangeMessage {
+  id: number;
+  exchange: number;
+  sender: ExchangeUser;
+  content: string;
+  date_created: string;
 }

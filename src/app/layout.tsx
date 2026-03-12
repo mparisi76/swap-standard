@@ -4,6 +4,7 @@ import "./globals.css";
 import { getValidToken } from "@/lib/auth";
 import { createDirectus, rest, staticToken, readMe } from "@directus/sdk";
 import Header from "@/components/layout/Header";
+import Footer from "@/components/layout/Footer";
 
 // Define the interface to match what the Header expects
 interface UserData {
@@ -84,12 +85,15 @@ export default async function RootLayout({
   }
 
   return (
-    <html lang="en">
+    <html lang="en" className="h-full">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+        className={`${geistSans.variable} ${geistMono.variable} antialiased bg-[#F9F8F6] flex flex-col min-h-full`}
       >
         <Header user={userData} />
-        {children}
+        <div className="flex-1 flex flex-col">
+          {children}
+        </div>
+        <Footer />
       </body>
     </html>
   );

@@ -8,6 +8,11 @@ import { type Metadata } from "next";
 import AssetGallery from "@/components/explore/AssetGallery";
 import RecentViewTracker from "@/components/explore/RecentViewTracker";
 import RecentlyViewed from "@/components/explore/RecentlyViewed";
+import SimilarItems from "@/components/explore/SimilarItems";
+import MoreFromMember from "@/components/explore/MoreFromMember";
+import { Suspense } from "react";
+
+import { getValidTokenWithUser } from "@/lib/auth";
 
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
@@ -22,6 +27,7 @@ const FIELDS = [
   "thumbnail",
   "image_gallery.directus_files_id",
   "date_created",
+  "user_created",
 ] as unknown as (keyof Asset)[];
 
 async function fetchAsset(id: string): Promise<Asset | null> {
@@ -79,8 +85,11 @@ export default async function AssetDetailPage({
 }) {
   const { id } = await params;
 
-  const asset = await fetchAsset(id);
+  const [asset, auth] = await Promise.all([fetchAsset(id), getValidTokenWithUser()]);
   if (!asset) notFound();
+
+  const isLoggedIn = !!auth;
+  const isOwner = !!auth && asset.user_created === auth.userId;
 
   return (
     <main className="min-h-screen bg-[#F9F8F6] pb-20">
@@ -168,14 +177,40 @@ export default async function AssetDetailPage({
             </div>
 
             <div className="pt-6">
-              <button className="w-full bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
-                Initiate Exchange
-              </button>
+              {!isLoggedIn ? (
+                <Link
+                  href={`/login?callbackUrl=/explore/${id}`}
+                  className="block w-full text-center bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  Log In to Initiate Exchange
+                </Link>
+              ) : isOwner ? (
+                <div className="border-2 border-zinc-200 py-5 text-center">
+                  <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+                    This is your listing
+                  </span>
+                </div>
+              ) : (
+                <Link
+                  href={`/dashboard/exchanges/new?asset=${id}`}
+                  className="block w-full text-center bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  Initiate Exchange
+                </Link>
+              )}
             </div>
           </div>
         </div>
       </div>
 
+      <Suspense fallback={null}>
+        <SimilarItems type={asset.type} currentId={asset.id} />
+      </Suspense>
+      {asset.user_created && (
+        <Suspense fallback={null}>
+          <MoreFromMember userId={asset.user_created} currentId={asset.id} />
+        </Suspense>
+      )}
       <RecentlyViewed currentId={id} />
     </main>
   );
