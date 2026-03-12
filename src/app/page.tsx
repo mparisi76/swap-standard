@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { directus } from "@/lib/directus";
 import { readItems } from "@directus/sdk";
 import { Asset } from "@/types/schema";
@@ -36,21 +37,33 @@ export default async function HomePage() {
 
         <AnimatedSection delay={0.2}>
           <section className="mb-12">
-            <div className="flex flex-col gap-2">
-              <label className="text-label font-bold uppercase tracking-widest text-zinc-500 ml-2">
-                Search the local exchange
-              </label>
-              <div className="flex border-4 border-zinc-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-                <input
-                  type="text"
-                  placeholder="How can you help today?"
-                  className="flex-1 px-6 py-5 text-body outline-none placeholder:text-zinc-400"
-                />
-                <button className="px-10 py-5 bg-zinc-900 text-white font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all text-label">
-                  Search
-                </button>
+            <form
+              action={async (formData: FormData) => {
+                "use server";
+                const q = (formData.get("search") as string).trim();
+                redirect(q ? `/explore?search=${encodeURIComponent(q)}` : "/explore");
+              }}
+            >
+              <div className="flex flex-col gap-2">
+                <label className="text-label font-bold uppercase tracking-widest text-zinc-500 ml-2">
+                  Search the local exchange
+                </label>
+                <div className="flex border-4 border-zinc-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+                  <input
+                    name="search"
+                    type="text"
+                    placeholder="Search for tools, skills, or items..."
+                    className="flex-1 px-6 py-5 text-body outline-none placeholder:text-zinc-400"
+                  />
+                  <button
+                    type="submit"
+                    className="px-10 py-5 bg-zinc-900 text-white font-bold uppercase tracking-widest hover:bg-emerald-700 transition-all text-label cursor-pointer"
+                  >
+                    Search
+                  </button>
+                </div>
               </div>
-            </div>
+            </form>
           </section>
         </AnimatedSection>
 

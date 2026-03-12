@@ -44,12 +44,15 @@ export default function Header({ user }: { user?: User | null }) {
           href="/"
           className="text-header font-black uppercase tracking-tighter text-zinc-900 hover:text-emerald-700 transition-colors"
         >
-          <span className="flex flex-col leading-[0.6] tracking-tight">
-            <span><span className="pl-4 text-[1.5em]">S</span>wap</span>
-            <span><span className="text-[1.5em]">S</span>tandard</span>
-            <span className="text-[0.55em] font-bold tracking-[0.2em] text-zinc-600 mt-2 normal-case">
-              Built on duty of care
+          <span className="flex items-center leading-none tracking-tight">
+            <span className="text-[2.25em] font-black">S</span>
+            <span className="flex flex-col leading-[.8] ml-0">
+              <span>wap</span>
+              <span>tandard</span>
             </span>
+          </span>
+          <span className="block text-[0.55em] font-bold tracking-[0.2em] text-zinc-600 mt-1 normal-case">
+            Built on duty of care
           </span>
         </Link>
 

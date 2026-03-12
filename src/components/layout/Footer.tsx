@@ -11,9 +11,12 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <div className="text-header font-black uppercase tracking-tighter text-zinc-900 mb-4">
-              <span className="flex flex-col leading-[0.6] tracking-tight">
-                <span><span className="pl-4 text-[1.5em]">S</span>wap</span>
-                <span><span className="text-[1.5em]">S</span>tandard</span>
+              <span className="flex items-center leading-none tracking-tight">
+                <span className="text-[2.25em] font-black">S</span>
+                <span className="flex flex-col leading-[.8] ml-0">
+                  <span>wap</span>
+                  <span>tandard</span>
+                </span>
               </span>
             </div>
             <p className="text-detail text-zinc-500 leading-relaxed">
