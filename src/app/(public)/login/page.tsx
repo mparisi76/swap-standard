@@ -1,17 +1,22 @@
 "use client";
 
-import { useActionState, Suspense, useEffect } from "react";
+import { useActionState, Suspense, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/actions/auth/login";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
   const searchParams = useSearchParams();
+  const turnstileRef = useRef<TurnstileInstance>(null);
 
   const isRegistered = searchParams.get("registered") === "true";
   const isExpired = searchParams.get("error") === "session_expired";
+
+  useEffect(() => {
+    if (state?.error) turnstileRef.current?.reset();
+  }, [state?.error]);
 
   useEffect(() => {
     if (isExpired) {
@@ -79,6 +84,7 @@ function LoginForm() {
         </div>
 
         <Turnstile
+          ref={turnstileRef}
           siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
           options={{ theme: "light" }}
         />

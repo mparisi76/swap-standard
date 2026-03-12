@@ -1,13 +1,19 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect, useRef } from "react";
 import { registerAction } from "@/app/actions/auth/register";
 import Link from "next/link";
-import { Turnstile } from "@marsidev/react-turnstile";
+import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 
 export default function RegisterPage() {
   const [state, formAction, isPending] = useActionState(registerAction, null);
-  
+  const turnstileRef = useRef<TurnstileInstance>(null);
+
+  // Reset widget whenever the action returns an error so the token stays fresh
+  useEffect(() => {
+    if (state?.error) turnstileRef.current?.reset();
+  }, [state?.error]);
+
   // Keep track of form values so they don't vanish
   const [formData, setFormData] = useState({
     firstName: "",
@@ -64,6 +70,7 @@ export default function RegisterPage() {
           </div>
 
           <Turnstile
+            ref={turnstileRef}
             siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
             options={{ theme: "light" }}
           />
