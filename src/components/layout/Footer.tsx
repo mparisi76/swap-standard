@@ -5,17 +5,15 @@ export default function Footer() {
 
   return (
     <footer className="bg-[#F9F8F6] text-zinc-900 border-t-4 border-zinc-900 mt-auto">
-      <div className="max-w-5xl mx-auto px-6 py-12">
+      <div className="px-6 py-12">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 pb-10 border-b-2 border-zinc-200">
 
           {/* Brand */}
           <div>
-            <div className="font-black uppercase leading-[0.6] tracking-tight mb-4">
-              <span className="block">
-                <span className="text-[1.5em]">S</span>wap
-              </span>
-              <span className="block">
-                <span className="text-[1.5em]">S</span>tandard
+            <div className="text-header font-black uppercase tracking-tighter text-zinc-900 mb-4">
+              <span className="flex flex-col leading-[0.6] tracking-tight">
+                <span><span className="pl-4 text-[1.5em]">S</span>wap</span>
+                <span><span className="text-[1.5em]">S</span>tandard</span>
               </span>
             </div>
             <p className="text-detail text-zinc-500 leading-relaxed">

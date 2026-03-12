@@ -24,9 +24,11 @@ export default function LocationPill() {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
+  const lat = searchParams.get("lat");
+
   useEffect(() => {
     setLocation(getUserLocation());
-  }, []);
+  }, [lat]);
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
