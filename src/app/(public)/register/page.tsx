@@ -3,6 +3,7 @@
 import { useActionState, useState } from "react";
 import { registerAction } from "@/app/actions/auth/register";
 import Link from "next/link";
+import { Turnstile } from "@marsidev/react-turnstile";
 
 export default function RegisterPage() {
   const [state, formAction, isPending] = useActionState(registerAction, null);
@@ -62,7 +63,12 @@ export default function RegisterPage() {
             </div>
           </div>
 
-          <button 
+          <Turnstile
+            siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
+            options={{ theme: "light" }}
+          />
+
+          <button
             disabled={isPending}
             type="submit"
             className="w-full bg-zinc-900 text-white py-4 font-black uppercase tracking-[0.2em] hover:bg-emerald-700 transition-all disabled:opacity-50"
