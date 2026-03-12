@@ -11,8 +11,9 @@ export async function loginAction(
   formData: FormData
 ): Promise<AuthState> {
   const turnstileToken = formData.get("cf-turnstile-response") as string;
-  if (!turnstileToken || !(await verifyTurnstile(turnstileToken))) {
-    return { error: "Human verification failed. Please try again." };
+  const turnstile = await verifyTurnstile(turnstileToken);
+  if (!turnstileToken || !turnstile.success) {
+    return { error: `Human verification failed. [${(turnstile.errorCodes ?? ["no-token"]).join(",")}]` };
   }
 
   const email = formData.get("email") as string;
