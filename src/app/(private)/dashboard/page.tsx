@@ -103,7 +103,7 @@ export default async function DashboardPage() {
             className="col-span-2 md:col-span-1 border-4 border-zinc-900 p-6 md:p-8 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
           >
             <Plus size={20} className="mb-3 text-emerald-700 group-hover:text-white transition-colors" />
-            <h2 className="text-body font-black uppercase">Register Asset</h2>
+            <h2 className="text-body font-black uppercase">New Listing</h2>
             <p className="text-detail uppercase mt-1 font-bold opacity-60">
               Share what you can offer
             </p>
@@ -193,7 +193,7 @@ export default async function DashboardPage() {
                 href="/dashboard/asset/new"
                 className="inline-block mt-4 text-label font-black uppercase tracking-widest text-emerald-700 border-b border-emerald-700 hover:text-zinc-900 hover:border-zinc-900 transition-all"
               >
-                Register your first asset →
+                Add your first listing →
               </Link>
             </div>
           ) : (

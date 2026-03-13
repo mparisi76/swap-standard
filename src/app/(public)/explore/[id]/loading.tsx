@@ -16,7 +16,7 @@ export default function AssetDetailLoading() {
             className="flex items-center gap-2 text-label font-bold uppercase tracking-widest text-zinc-400"
           >
             <ArrowLeft size={16} strokeWidth={2.5} />
-            Registry Index
+            Explore
           </Link>
           <Skeleton className="h-3 w-24" />
         </div>

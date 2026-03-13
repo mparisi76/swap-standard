@@ -27,7 +27,7 @@ export default function Footer() {
           {/* Navigation */}
           <div>
             <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-4">
-              Registry
+              Explore
             </span>
             <nav className="space-y-2">
               <Link
@@ -46,7 +46,13 @@ export default function Footer() {
                 href="/dashboard/asset/new"
                 className="block text-detail font-bold uppercase tracking-widest text-zinc-600 hover:text-emerald-700 transition-colors"
               >
-                Register Asset
+                New Listing
+              </Link>
+              <Link
+                href="/contact"
+                className="block text-detail font-bold uppercase tracking-widest text-zinc-600 hover:text-emerald-700 transition-colors"
+              >
+                Contact
               </Link>
             </nav>
           </div>

@@ -31,7 +31,7 @@ export default function RegisterPage() {
     <main className="min-h-[calc(100vh-80px)] w-full flex items-center justify-center p-6 bg-[#F9F8F6]">
       <div className="w-full max-w-lg bg-white border-4 border-zinc-900 p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <header className="mb-8">
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-zinc-900">Join the Registry</h1>
+          <h1 className="text-2xl font-black uppercase tracking-tighter text-zinc-900">Create Account</h1>
         </header>
 
         <form action={formAction} className="space-y-6">
@@ -80,7 +80,7 @@ export default function RegisterPage() {
             type="submit"
             className="w-full bg-zinc-900 text-white py-4 font-black uppercase tracking-[0.2em] hover:bg-emerald-700 transition-all disabled:opacity-50"
           >
-            {isPending ? "Registering..." : "Join the Registry"}
+            {isPending ? "Registering..." : "Create Account"}
           </button>
         </form>
 

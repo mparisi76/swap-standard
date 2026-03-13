@@ -104,7 +104,7 @@ export default function LocationInterstitial() {
         {/* Header */}
         <div className="border-b-4 border-zinc-900 px-8 py-6">
           <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
-            Registry Access
+            Local Exchange
           </span>
           <h2 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
             Where are you operating from?

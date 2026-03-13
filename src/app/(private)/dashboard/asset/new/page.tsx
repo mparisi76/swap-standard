@@ -4,7 +4,7 @@ import { ArrowLeft } from "lucide-react";
 import NewAssetForm from "./NewAssetForm";
 
 export const metadata: Metadata = {
-  title: "Register Asset | SwapStandard",
+  title: "New Listing | SwapStandard",
 };
 
 export default function NewAssetPage() {
@@ -30,10 +30,10 @@ export default function NewAssetPage() {
       <div className="max-w-2xl mx-auto px-6 py-12">
         <header className="border-b-4 border-zinc-900 pb-8 mb-12">
           <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
-            Registry
+            Listings
           </span>
           <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
-            Register an Asset
+            New Listing
           </h1>
           <p className="text-body text-zinc-500 mt-4 leading-relaxed">
             Share what you have. State what you need. Your community is the network.

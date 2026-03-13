@@ -93,5 +93,23 @@ export async function registerAction(
     return { error: message, fields };
   }
 
+  // Notify admin of new signup — fire and forget, don't block redirect
+  const resendKey = process.env.RESEND_API_KEY;
+  if (resendKey) {
+    fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "SwapStandard <noreply@swapstandard.com>",
+        to: "swapstandard@gmail.com",
+        subject: "New member signup",
+        text: `New member registered on SwapStandard.\n\nName: ${firstName} ${lastName}\nHandle: ${handle || "—"}\nEmail: ${email}\n`,
+      }),
+    }).catch(() => {}); // silently ignore failures
+  }
+
   redirect("/login?registered=true");
 }

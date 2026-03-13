@@ -84,7 +84,7 @@ export default function Header({ user }: { user?: User | null }) {
                   <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-400">
                     {user.email}
                   </div>
-                  <Link href="/dashboard/settings" className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase hover:bg-zinc-50">
+                  <Link href="/dashboard/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase hover:bg-zinc-50">
                     <Settings size={12} /> Settings
                   </Link>
                   <form action={logoutAction}>
