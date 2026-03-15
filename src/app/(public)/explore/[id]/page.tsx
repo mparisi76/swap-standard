@@ -10,6 +10,7 @@ import RecentViewTracker from "@/components/explore/RecentViewTracker";
 import RecentlyViewed from "@/components/explore/RecentlyViewed";
 import SimilarItems from "@/components/explore/SimilarItems";
 import MoreFromMember from "@/components/explore/MoreFromMember";
+import ChainTradesSection from "@/components/explore/ChainTradesSection";
 import { Suspense } from "react";
 
 import { getValidTokenWithUser } from "@/lib/auth";
@@ -120,7 +121,7 @@ export default async function AssetDetailPage({
       />
       <RecentViewTracker assetId={id} />
 
-      <div className="border-b-2 border-zinc-900 bg-white sticky top-18 z-30">
+      <div className="border-b-2 border-zinc-900 bg-white sticky top-(--header-height) z-30">
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/explore"
@@ -133,6 +134,12 @@ export default async function AssetDetailPage({
             REF—{String(asset.id).padStart(6, "0")}
           </span>
         </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-6 pt-8">
+        <Suspense fallback={null}>
+          <ChainTradesSection assetId={asset.id} currentUserId={auth?.userId ?? null} />
+        </Suspense>
       </div>
 
       <div className="max-w-5xl mx-auto px-6 py-12">
@@ -210,11 +217,12 @@ export default async function AssetDetailPage({
                   Log In to Initiate Exchange
                 </Link>
               ) : isOwner ? (
-                <div className="border-2 border-zinc-200 py-5 text-center">
-                  <span className="text-label font-black uppercase tracking-widest text-zinc-400">
-                    This is your listing
-                  </span>
-                </div>
+                <Link
+                  href={`/dashboard/asset/${id}/edit`}
+                  className="block w-full text-center border-2 border-zinc-900 bg-white text-zinc-900 font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-zinc-100 transition-all shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                >
+                  Edit Listing
+                </Link>
               ) : (
                 <Link
                   href={`/dashboard/exchanges/new?asset=${id}`}
@@ -224,10 +232,10 @@ export default async function AssetDetailPage({
                 </Link>
               )}
             </div>
+
           </div>
         </div>
       </div>
-
       <Suspense fallback={null}>
         <SimilarItems type={asset.type} currentId={asset.id} />
       </Suspense>

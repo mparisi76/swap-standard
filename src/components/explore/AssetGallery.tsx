@@ -21,9 +21,11 @@ export default function AssetGallery({
   const uniqueGallery = (photo_gallery || []).filter(
     (item) => item.directus_files_id !== thumbnail,
   );
-  const allImages = [{ directus_files_id: thumbnail }, ...uniqueGallery];
+  const allImages = thumbnail
+    ? [{ directus_files_id: thumbnail }, ...uniqueGallery]
+    : uniqueGallery;
 
-  const [activeImage, setActiveImage] = useState<string>(thumbnail);
+  const [activeImage, setActiveImage] = useState<string>(allImages[0]?.directus_files_id ?? "");
   const [isLoaded, setIsLoaded] = useState(false);
   const [isError, setIsError] = useState(false);
 
@@ -38,53 +40,54 @@ export default function AssetGallery({
     <section className="lg:col-span-6 space-y-6">
       {/* Main Image Viewport */}
       <div className="aspect-4/5 bg-white relative overflow-hidden border-4 border-zinc-900 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
-        {/* SKELETON */}
-        {!isLoaded && !isError && (
+        {allImages.length === 0 ? (
+          /* NO IMAGE PLACEHOLDER */
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-100">
-            <div className="animate-pulse flex flex-col items-center">
-              <ImageIcon
-                className="text-zinc-400 mb-2"
-                size={32}
-                strokeWidth={1}
-              />
-              <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-600">
-                Loading
-              </span>
-            </div>
+            <ImageIcon className="text-zinc-300 mb-3" size={40} strokeWidth={1} />
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400">
+              No Image
+            </span>
           </div>
-        )}
+        ) : (
+          <>
+            {/* SKELETON */}
+            {!isLoaded && !isError && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-100">
+                <div className="animate-pulse flex flex-col items-center">
+                  <ImageIcon className="text-zinc-400 mb-2" size={32} strokeWidth={1} />
+                  <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-600">
+                    Loading
+                  </span>
+                </div>
+              </div>
+            )}
 
-        {/* IMAGE */}
-        <img
-          key={activeImage}
-          src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${activeImage}?width=1000&quality=80&fit=inside`}
-          alt={name}
-          onLoad={() => {
-            setIsLoaded(true);
-          }}
-          onError={() => {
-            setIsError(true);
-            setIsLoaded(true);
-          }}
-          ref={(img) => {
-            if (img && img.complete && !isLoaded && !isError) {
-              setIsLoaded(true);
-            }
-          }}
-          className={`relative z-10 object-contain w-full h-full bg-[#F9F8F6] transition-all duration-500 ease-in-out
-            ${isLoaded && !isError ? "opacity-100 scale-100" : "opacity-0 scale-[1.01]"} 
-            ${isSold ? "grayscale opacity-60" : "grayscale-0"} 
-          `}
-        />
+            {/* IMAGE */}
+            <img
+              key={activeImage}
+              src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${activeImage}?width=1000&quality=80&fit=inside`}
+              alt={name}
+              onLoad={() => setIsLoaded(true)}
+              onError={() => { setIsError(true); setIsLoaded(true); }}
+              ref={(img) => {
+                if (img && img.complete && !isLoaded && !isError) setIsLoaded(true);
+              }}
+              className={`relative z-10 object-contain w-full h-full bg-[#F9F8F6] transition-all duration-500 ease-in-out
+                ${isLoaded && !isError ? "opacity-100 scale-100" : "opacity-0 scale-[1.01]"}
+                ${isSold ? "grayscale opacity-60" : "grayscale-0"}
+              `}
+            />
 
-        {/* ERROR STATE */}
-        {isError && (
-          <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-100 p-8 text-center">
-            <AlertCircle className="text-zinc-400 mb-3" size={24} />
-            <p className="text-label font-bold uppercase tracking-widest text-zinc-500">
-              Visual_Ref Unreachable
-            </p>
-          </div>
+            {/* ERROR STATE */}
+            {isError && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-100 p-8 text-center">
+                <AlertCircle className="text-zinc-400 mb-3" size={24} />
+                <p className="text-label font-bold uppercase tracking-widest text-zinc-500">
+                  Image not available
+                </p>
+              </div>
+            )}
+          </>
         )}
 
         {/* STATUS STAMP */}

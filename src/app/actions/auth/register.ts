@@ -9,6 +9,7 @@ import {
   createUser,
   DirectusUser,
 } from "@directus/sdk";
+import { generateVerificationToken } from "@/utils/email-token";
 
 export type AuthResponse = {
   error?: string;
@@ -93,9 +94,29 @@ export async function registerAction(
     return { error: message, fields };
   }
 
-  // Notify admin of new signup — fire and forget, don't block redirect
   const resendKey = process.env.RESEND_API_KEY;
+  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com";
+
   if (resendKey) {
+    const token = generateVerificationToken(email);
+    const verifyUrl = `${siteUrl}/verify-email?token=${token}`;
+
+    // Send verification email to new user
+    fetch("https://api.resend.com/emails", {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${resendKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        from: "SwapStandard <noreply@swapstandard.com>",
+        to: email,
+        subject: "Verify your SwapStandard account",
+        text: `Hi ${firstName},\n\nVerify your email to activate your SwapStandard account:\n\n${verifyUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can ignore this email.\n\n— SwapStandard`,
+      }),
+    }).catch(() => {});
+
+    // Notify admin of new signup
     fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
@@ -108,7 +129,7 @@ export async function registerAction(
         subject: "New member signup",
         text: `New member registered on SwapStandard.\n\nName: ${firstName} ${lastName}\nHandle: ${handle || "—"}\nEmail: ${email}\n`,
       }),
-    }).catch(() => {}); // silently ignore failures
+    }).catch(() => {});
   }
 
   redirect("/login?registered=true");

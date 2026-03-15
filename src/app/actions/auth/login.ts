@@ -46,5 +46,6 @@ export async function loginAction(
     return { error: "Connection to Server failed" };
   }
 
-  redirect("/dashboard");
+  const callbackUrl = formData.get("callbackUrl") as string | null;
+  redirect(callbackUrl && callbackUrl.startsWith("/") ? callbackUrl : "/dashboard");
 }

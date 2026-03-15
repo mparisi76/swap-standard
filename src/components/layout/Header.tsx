@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect, Suspense } from "react";
+import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { ChevronDown, Settings, LogOut, Menu, X } from "lucide-react";
@@ -15,9 +16,14 @@ interface User {
 }
 
 export default function Header({ user }: { user?: User | null }) {
+  const pathname = usePathname();
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isMobileOpen, setIsMobileOpen] = useState(false);
+  const [openedOnPathname, setOpenedOnPathname] = useState<string | null>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const profileOpen = isProfileOpen && openedOnPathname === pathname;
+  const mobileOpen = isMobileOpen && openedOnPathname === pathname;
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -71,7 +77,7 @@ export default function Header({ user }: { user?: User | null }) {
           {user && (
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => setIsProfileOpen(!isProfileOpen)}
+                onClick={() => { setIsProfileOpen(!profileOpen); setOpenedOnPathname(pathname); }}
                 className="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-900 flex items-center justify-center text-white text-[10px] font-black relative cursor-pointer"
               >
                 {getInitials(user.name || "ST")}
@@ -79,7 +85,7 @@ export default function Header({ user }: { user?: User | null }) {
                   <ChevronDown size={8} className="text-zinc-900" />
                 </div>
               </button>
-              {isProfileOpen && (
+              {profileOpen && (
                 <div className="absolute right-0 mt-3 w-48 bg-white border-2 border-zinc-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-2">
                   <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-400">
                     {user.email}
@@ -88,6 +94,7 @@ export default function Header({ user }: { user?: User | null }) {
                     <Settings size={12} /> Settings
                   </Link>
                   <form action={logoutAction}>
+                    <input type="hidden" name="returnTo" value={pathname} />
                     <button type="submit" className="w-full flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase text-red-600 hover:bg-red-50 cursor-pointer">
                       <LogOut size={12} /> Logout
                     </button>
@@ -104,18 +111,18 @@ export default function Header({ user }: { user?: User | null }) {
             Portal
           </Link>
           <button
-            onClick={() => setIsMobileOpen(!isMobileOpen)}
+            onClick={() => { setIsMobileOpen(!mobileOpen); setOpenedOnPathname(pathname); }}
             className="w-10 h-10 border-2 border-zinc-900 flex items-center justify-center bg-white cursor-pointer"
             aria-label="Toggle menu"
           >
-            {isMobileOpen ? <X size={18} strokeWidth={2.5} /> : <Menu size={18} strokeWidth={2.5} />}
+            {mobileOpen ? <X size={18} strokeWidth={2.5} /> : <Menu size={18} strokeWidth={2.5} />}
           </button>
         </div>
       </nav>
 
       {/* Mobile menu */}
       <AnimatePresence>
-        {isMobileOpen && (
+        {mobileOpen && (
           <motion.div
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: "auto", opacity: 1 }}
@@ -152,6 +159,7 @@ export default function Header({ user }: { user?: User | null }) {
                 <div className="pt-2 space-y-3">
                   <p className="font-mono text-detail text-zinc-400 uppercase tracking-widest">{user.email}</p>
                   <form action={logoutAction}>
+                    <input type="hidden" name="returnTo" value={pathname} />
                     <button type="submit" className="flex items-center gap-2 text-label font-black uppercase tracking-widest text-red-600 cursor-pointer">
                       <LogOut size={14} /> Logout
                     </button>

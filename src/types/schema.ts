@@ -22,14 +22,42 @@ export interface Asset {
   latitude?: number | null;
   longitude?: number | null;
   location_label?: string | null;
+  offering_tags?: string[] | null;
+  seeking_tags?: string[] | null;
   // Computed field — not stored in Directus, populated by the assets service
   distance_miles?: number;
+}
+
+export type ChainTradeStatus = 'suggested' | 'pending' | 'completed' | 'expired' | 'declined';
+
+export interface ChainTradeAsset {
+  id: number;
+  title: string;
+  location_label: string | null;
+  user_created: { id: string; first_name: string | null; last_name: string | null };
+}
+
+export interface ChainTrade {
+  id: number;
+  chain_status: ChainTradeStatus;
+  asset_a: number | ChainTradeAsset;
+  asset_b: number | ChainTradeAsset;
+  asset_c: number | ChainTradeAsset;
+  user_a: string;
+  user_b: string;
+  user_c: string;
+  accepted_a: boolean;
+  accepted_b: boolean;
+  accepted_c: boolean;
+  date_created: string;
+  date_updated: string;
 }
 
 export interface SwapSchema {
   assets: Asset[];
   exchanges: Exchange[];
   exchange_messages: ExchangeMessage[];
+  chain_trades: ChainTrade[];
 }
 
 export type ExchangeStatus = 'pending' | 'active' | 'completed' | 'declined';

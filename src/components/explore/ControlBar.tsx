@@ -48,7 +48,7 @@ function RadiusFilter() {
 
 export default function ControlBar() {
   return (
-    <div className="sticky top-18.25 z-40 bg-[#F9F8F6] border-b border-zinc-200 shadow-sm">
+    <div className="sticky top-(--header-height) z-40 bg-[#F9F8F6] border-b border-zinc-200 shadow-sm">
       <div className="py-3 px-4 lg:px-6 flex flex-col gap-2 lg:flex-row lg:items-center lg:gap-4">
         <div className="lg:flex-1">
           <SearchBar />

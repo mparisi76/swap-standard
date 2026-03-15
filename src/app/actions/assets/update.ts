@@ -22,7 +22,9 @@ export async function updateAssetAction(
   const title = (formData.get("title") as string)?.trim();
   const type = formData.get("type") as string;
   const offering = (formData.get("offering") as string)?.trim();
+  const offering_tags = formData.getAll("offering_tags") as string[];
   const seeking = (formData.get("seeking") as string)?.trim();
+  const seeking_tags = formData.getAll("seeking_tags") as string[];
   const asset_status = formData.get("asset_status") as string;
 
   const fieldErrors: Record<string, string> = {};
@@ -72,7 +74,9 @@ export async function updateAssetAction(
       title,
       type,
       offering,
+      offering_tags,
       seeking,
+      seeking_tags,
       asset_status,
       ...(isPublishing && { status: "published" }),
       ...(isSavingDraft && { status: "draft" }),

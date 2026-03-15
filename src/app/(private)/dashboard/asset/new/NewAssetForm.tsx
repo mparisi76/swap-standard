@@ -1,11 +1,15 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { createAssetAction, type AssetFormState } from "@/app/actions/assets/create";
+import {
+  createAssetAction,
+  type AssetFormState,
+} from "@/app/actions/assets/create";
 import { lookupZipCode } from "@/utils/geo";
 import HoneypotField from "@/components/shared/HoneypotField";
 import { Loader, MapPin, CheckCircle } from "lucide-react";
 import PhotoUploader from "@/components/assets/PhotoUploader";
+import TagSelector from "@/components/assets/TagSelector";
 
 const ASSET_TYPES = ["goods", "skills", "services"] as const;
 
@@ -18,7 +22,9 @@ export default function NewAssetForm() {
   const [assetType, setAssetType] = useState<string>("goods");
   const [title, setTitle] = useState("");
   const [offering, setOffering] = useState("");
+  const [offeringTags, setOfferingTags] = useState<string[]>([]);
   const [seeking, setSeeking] = useState("");
+  const [seekingTags, setSeekingTags] = useState<string[]>([]);
   const [zip, setZip] = useState("");
   const [locationLabel, setLocationLabel] = useState("");
   const [zipLoading, setZipLoading] = useState(false);
@@ -45,7 +51,10 @@ export default function NewAssetForm() {
   };
 
   const fieldError = (field: string) => state?.fieldErrors?.[field];
-  const isValid = title.trim().length > 0 && offering.trim().length > 0 && seeking.trim().length > 0;
+  const isValid =
+    title.trim().length > 0 &&
+    offering.trim().length > 0 &&
+    seeking.trim().length > 0;
 
   return (
     <form action={action} className="space-y-10">
@@ -72,9 +81,10 @@ export default function NewAssetForm() {
               type="button"
               onClick={() => setAssetType(t)}
               className={`text-label font-black uppercase tracking-widest px-6 py-3 border-2 transition-all cursor-pointer
-                ${assetType === t
-                  ? "bg-zinc-900 text-white border-zinc-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
-                  : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                ${
+                  assetType === t
+                    ? "bg-zinc-900 text-white border-zinc-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+                    : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-100 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                 }`}
             >
               {t}
@@ -84,7 +94,9 @@ export default function NewAssetForm() {
         {/* Hidden input carries the selected type */}
         <input type="hidden" name="type" value={assetType} />
         {fieldError("type") && (
-          <p className="text-label font-bold text-red-600 uppercase">{fieldError("type")}</p>
+          <p className="text-label font-bold text-red-600 uppercase">
+            {fieldError("type")}
+          </p>
         )}
       </div>
 
@@ -106,7 +118,9 @@ export default function NewAssetForm() {
           className="w-full border-2 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
         />
         {fieldError("title") && (
-          <p className="text-label font-bold text-red-600 uppercase">{fieldError("title")}</p>
+          <p className="text-label font-bold text-red-600 uppercase">
+            {fieldError("title")}
+          </p>
         )}
       </div>
 
@@ -119,7 +133,8 @@ export default function NewAssetForm() {
           I&apos;m offering
         </label>
         <p className="text-detail text-zinc-500 italic">
-          Describe what you have. Be specific — condition, quantity, availability.
+          Describe what you have. Be specific — condition, quantity,
+          availability.
         </p>
         <textarea
           id="offering"
@@ -131,8 +146,19 @@ export default function NewAssetForm() {
           className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none"
         />
         {fieldError("offering") && (
-          <p className="text-label font-bold text-red-600 uppercase">{fieldError("offering")}</p>
+          <p className="text-label font-bold text-red-600 uppercase">
+            {fieldError("offering")}
+          </p>
         )}
+        <p className="text-detail text-zinc-500 italic">
+          Tag what you&apos;re offering to help others find your listing.
+        </p>
+        <TagSelector
+          selected={offeringTags}
+          onChange={setOfferingTags}
+          name="offering_tags"
+          placeholder="e.g. Power Tools, Fresh Produce…"
+        />
       </div>
 
       {/* Seeking */}
@@ -156,8 +182,20 @@ export default function NewAssetForm() {
           className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none border-l-4 border-l-emerald-600"
         />
         {fieldError("seeking") && (
-          <p className="text-label font-bold text-red-600 uppercase">{fieldError("seeking")}</p>
+          <p className="text-label font-bold text-red-600 uppercase">
+            {fieldError("seeking")}
+          </p>
         )}
+        <p className="text-detail text-zinc-500 italic">
+          Tag what you&apos;d accept in trade — used to match you with other
+          members.
+        </p>
+        <TagSelector
+          selected={seekingTags}
+          onChange={setSeekingTags}
+          name="seeking_tags"
+          placeholder="e.g. Childcare & Babysitting, Carpentry…"
+        />
       </div>
 
       {/* Location */}
@@ -172,8 +210,14 @@ export default function NewAssetForm() {
           <input
             type="text"
             value={zip}
-            onChange={(e) => { setZip(e.target.value); setLocationLabel(""); setZipError(""); }}
-            onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), handleVerifyZip())}
+            onChange={(e) => {
+              setZip(e.target.value);
+              setLocationLabel("");
+              setZipError("");
+            }}
+            onKeyDown={(e) =>
+              e.key === "Enter" && (e.preventDefault(), handleVerifyZip())
+            }
             placeholder="ZIP code"
             maxLength={5}
             className="flex-1 border-2 border-r-0 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-300 outline-none bg-white"
@@ -184,7 +228,11 @@ export default function NewAssetForm() {
             disabled={zipLoading}
             className="px-6 py-4 bg-zinc-900 text-white text-label font-black uppercase tracking-widest hover:bg-emerald-700 transition-colors cursor-pointer disabled:opacity-50 border-2 border-zinc-900"
           >
-            {zipLoading ? <Loader size={14} className="animate-spin" /> : "Verify"}
+            {zipLoading ? (
+              <Loader size={14} className="animate-spin" />
+            ) : (
+              "Verify"
+            )}
           </button>
         </div>
 
@@ -207,7 +255,10 @@ export default function NewAssetForm() {
       {/* Photos */}
       <div className="space-y-3">
         <label className="text-label font-black uppercase tracking-widest text-zinc-400 block">
-          Photos <span className="text-zinc-300 normal-case font-bold tracking-normal">(optional)</span>
+          Photos{" "}
+          <span className="text-zinc-300 normal-case font-bold tracking-normal">
+            (optional)
+          </span>
         </label>
         <PhotoUploader />
       </div>
@@ -242,7 +293,7 @@ export default function NewAssetForm() {
           name="submitType"
           value="publish"
           disabled={pending || !isValid}
-          className="flex-[2] bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+          className="flex-2 bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
         >
           {pending ? (
             <span className="flex items-center justify-center gap-3">
@@ -254,7 +305,6 @@ export default function NewAssetForm() {
           )}
         </button>
       </div>
-
     </form>
   );
 }

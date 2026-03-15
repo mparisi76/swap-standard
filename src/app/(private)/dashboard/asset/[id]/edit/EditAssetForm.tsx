@@ -5,6 +5,7 @@ import { updateAssetAction, type AssetFormState } from "@/app/actions/assets/upd
 import { lookupZipCode } from "@/utils/geo";
 import { Loader, MapPin, CheckCircle } from "lucide-react";
 import PhotoUploader, { type InitialPhoto } from "@/components/assets/PhotoUploader";
+import TagSelector from "@/components/assets/TagSelector";
 import { type Asset } from "@/types/schema";
 
 const ASSET_TYPES = ["goods", "skills", "services"] as const;
@@ -31,7 +32,9 @@ export default function EditAssetForm({ asset, initialPhotos }: Props) {
   const [assetStatus, setAssetStatus] = useState(asset.asset_status);
   const [title, setTitle] = useState(asset.title);
   const [offering, setOffering] = useState(asset.offering);
+  const [offeringTags, setOfferingTags] = useState<string[]>(asset.offering_tags ?? []);
   const [seeking, setSeeking] = useState(asset.seeking);
+  const [seekingTags, setSeekingTags] = useState<string[]>(asset.seeking_tags ?? []);
   const [zip, setZip] = useState("");
   const [newLocationLabel, setNewLocationLabel] = useState("");
   const [zipLoading, setZipLoading] = useState(false);
@@ -144,6 +147,15 @@ export default function EditAssetForm({ asset, initialPhotos }: Props) {
         {fieldError("offering") && (
           <p className="text-label font-bold text-red-600 uppercase">{fieldError("offering")}</p>
         )}
+        <p className="text-detail text-zinc-500 italic">
+          Tag what you&apos;re offering to help others find your listing.
+        </p>
+        <TagSelector
+          selected={offeringTags}
+          onChange={setOfferingTags}
+          name="offering_tags"
+          placeholder="e.g. Power Tools, Fresh Produce…"
+        />
       </div>
 
       {/* Seeking */}
@@ -169,6 +181,15 @@ export default function EditAssetForm({ asset, initialPhotos }: Props) {
         {fieldError("seeking") && (
           <p className="text-label font-bold text-red-600 uppercase">{fieldError("seeking")}</p>
         )}
+        <p className="text-detail text-zinc-500 italic">
+          Tag what you&apos;d accept in trade — used to match you with other members.
+        </p>
+        <TagSelector
+          selected={seekingTags}
+          onChange={setSeekingTags}
+          name="seeking_tags"
+          placeholder="e.g. Childcare &amp; Babysitting, Carpentry…"
+        />
       </div>
 
       {/* Asset Status */}
@@ -289,7 +310,7 @@ export default function EditAssetForm({ asset, initialPhotos }: Props) {
           name="submitType"
           value="publish"
           disabled={pending || !isValid}
-          className="flex-[2] bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
+          className="flex-2 bg-zinc-900 text-white font-black uppercase tracking-[0.3em] py-5 text-label hover:bg-emerald-700 transition-all shadow-[6px_6px_0px_0px_rgba(0,0,0,1)] disabled:opacity-60 cursor-pointer disabled:cursor-not-allowed"
         >
           {pending ? (
             <span className="flex items-center justify-center gap-3">

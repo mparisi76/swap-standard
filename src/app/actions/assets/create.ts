@@ -67,6 +67,9 @@ export async function createAssetAction(
     .filter(Boolean)
     .map((id) => ({ directus_files_id: id }));
 
+  const offering_tags = formData.getAll("offering_tags") as string[];
+  const seeking_tags = formData.getAll("seeking_tags") as string[];
+
   const submitType = formData.get("submitType") as string;
   const isPublishing = submitType === "publish";
 
@@ -89,6 +92,8 @@ export async function createAssetAction(
       latitude,
       longitude,
       location_label,
+      offering_tags: offering_tags.length > 0 ? offering_tags : [],
+      seeking_tags: seeking_tags.length > 0 ? seeking_tags : [],
     }),
   });
 

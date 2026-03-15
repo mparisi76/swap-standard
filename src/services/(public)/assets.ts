@@ -74,6 +74,8 @@ export const getAssets = cache(
           "latitude",
           "longitude",
           "location_label",
+          "offering_tags",
+          "seeking_tags",
         ],
         sort: ["-date_created", "-id"],
         limit,

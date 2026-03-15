@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 async function getAsset(token: string, id: string): Promise<Asset | null> {
   const baseUrl = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
   const fields = [
-    "id", "status", "title", "type", "offering", "seeking",
+    "id", "status", "title", "type", "offering", "offering_tags", "seeking", "seeking_tags",
     "asset_status", "thumbnail", "image_gallery.directus_files_id",
     "latitude", "longitude", "location_label",
   ].join(",");

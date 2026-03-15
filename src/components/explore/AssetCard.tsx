@@ -58,11 +58,29 @@ export default function AssetCard({ asset }: { asset: Asset }) {
                 {asset.offering}
               </p>
             )}
+            {asset.offering_tags && asset.offering_tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {asset.offering_tags.map((tag) => (
+                  <span key={tag} className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-zinc-300 text-zinc-500">
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            )}
             {isSeeking && (
               <p className="text-detail text-zinc-600 leading-tight line-clamp-2">
                 <span className="font-black uppercase text-zinc-600">Seeking: </span>
                 {asset.seeking}
               </p>
+            )}
+            {asset.seeking_tags && asset.seeking_tags.length > 0 && (
+              <div className="flex flex-wrap gap-1">
+                {asset.seeking_tags.map((tag) => (
+                  <span key={tag} className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-emerald-300 text-emerald-700">
+                    {tag}
+                  </span>
+                ))}
+              </div>
             )}
           </div>
         )}

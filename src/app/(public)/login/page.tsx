@@ -25,6 +25,8 @@ function LoginForm() {
     }
   }, [isExpired]);
 
+  const callbackUrl = searchParams.get("callbackUrl") ?? "/dashboard";
+
   return (
     <div className="w-full max-w-sm bg-white border-4 border-zinc-900 p-8 md:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
       <header className="mb-10 text-center space-y-2">
@@ -35,9 +37,12 @@ function LoginForm() {
       </header>
 
       {isRegistered && (
-        <div className="bg-emerald-700 p-4 text-center mb-8">
+        <div className="bg-emerald-700 p-4 text-center mb-8 space-y-1">
           <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
-            Application Received
+            Account Created
+          </p>
+          <p className="text-[10px] text-emerald-100 tracking-wide">
+            Check your email to verify your account.
           </p>
         </div>
       )}
@@ -51,6 +56,7 @@ function LoginForm() {
       )}
 
       <form action={formAction} className="space-y-6">
+        <input type="hidden" name="callbackUrl" value={callbackUrl} />
         {state?.error && (
           <div className="bg-red-50 border-2 border-red-600 p-4 text-center">
             <p className="text-[10px] font-black uppercase tracking-widest text-red-600">
