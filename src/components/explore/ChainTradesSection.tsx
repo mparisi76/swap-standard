@@ -50,7 +50,7 @@ interface Props {
 }
 
 export default async function ChainTradesSection({ assetId, currentUserId }: Props) {
-  if (!features.chainTrades) return null;
+  if (!features.chainTrades || !currentUserId) return null;
 
   const chains = await fetchChainTrades(assetId);
   if (chains.length === 0) return null;
