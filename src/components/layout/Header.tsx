@@ -27,7 +27,10 @@ export default function Header({ user }: { user?: User | null }) {
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
-      if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(event.target as Node)
+      ) {
         setIsProfileOpen(false);
       }
     }
@@ -35,16 +38,20 @@ export default function Header({ user }: { user?: User | null }) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-
   const getInitials = (name: string) =>
-    name.split(" ").map((n) => n[0]).join("").toUpperCase().slice(0, 2);
+    name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
 
   return (
     <motion.header
       style={{ borderBottomWidth: 4 }}
       className="sticky top-0 z-50 bg-[#F9F8F6]/90 backdrop-blur-md border-zinc-900"
     >
-      <nav className="px-6 py-4 flex items-center justify-between">
+      <nav className="px-6 py-4 flex items-center justify-between h-full">
         {/* Logo */}
         <Link
           href="/"
@@ -64,10 +71,16 @@ export default function Header({ user }: { user?: User | null }) {
 
         {/* Desktop nav */}
         <div className="hidden md:flex gap-6 items-center text-label font-bold uppercase tracking-[0.2em] text-zinc-900">
-          <Link href="/explore" className="hover:underline underline-offset-4 decoration-2">
+          <Link
+            href="/explore"
+            className="hover:underline underline-offset-4 decoration-2"
+          >
             Explore
           </Link>
-          <Link href="/dashboard" className="px-6 py-3 bg-zinc-900 text-white hover:bg-emerald-700 transition-all text-label">
+          <Link
+            href="/dashboard"
+            className="px-6 py-3 bg-zinc-900 text-white hover:bg-emerald-700 transition-all text-label"
+          >
             Portal
           </Link>
           <Suspense fallback={null}>
@@ -77,7 +90,10 @@ export default function Header({ user }: { user?: User | null }) {
           {user && (
             <div className="relative" ref={dropdownRef}>
               <button
-                onClick={() => { setIsProfileOpen(!profileOpen); setOpenedOnPathname(pathname); }}
+                onClick={() => {
+                  setIsProfileOpen(!profileOpen);
+                  setOpenedOnPathname(pathname);
+                }}
                 className="w-10 h-10 rounded-full border-2 border-zinc-900 bg-zinc-900 flex items-center justify-center text-white text-[10px] font-black relative cursor-pointer"
               >
                 {getInitials(user.name || "ST")}
@@ -90,12 +106,19 @@ export default function Header({ user }: { user?: User | null }) {
                   <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-400">
                     {user.email}
                   </div>
-                  <Link href="/dashboard/settings" onClick={() => setIsProfileOpen(false)} className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase hover:bg-zinc-50">
+                  <Link
+                    href="/dashboard/settings"
+                    onClick={() => setIsProfileOpen(false)}
+                    className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase hover:bg-zinc-50"
+                  >
                     <Settings size={12} /> Settings
                   </Link>
                   <form action={logoutAction}>
                     <input type="hidden" name="returnTo" value={pathname} />
-                    <button type="submit" className="w-full flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase text-red-600 hover:bg-red-50 cursor-pointer">
+                    <button
+                      type="submit"
+                      className="w-full flex items-center gap-2 px-4 py-2 text-[10px] font-black uppercase text-red-600 hover:bg-red-50 cursor-pointer"
+                    >
                       <LogOut size={12} /> Logout
                     </button>
                   </form>
@@ -107,15 +130,25 @@ export default function Header({ user }: { user?: User | null }) {
 
         {/* Mobile: Portal link + hamburger */}
         <div className="flex md:hidden items-center gap-3">
-          <Link href="/dashboard" className="px-4 py-2 bg-zinc-900 text-white text-label font-black uppercase tracking-widest">
+          <Link
+            href="/dashboard"
+            className="px-4 py-2 bg-zinc-900 text-white text-label font-black uppercase tracking-widest"
+          >
             Portal
           </Link>
           <button
-            onClick={() => { setIsMobileOpen(!mobileOpen); setOpenedOnPathname(pathname); }}
+            onClick={() => {
+              setIsMobileOpen(!mobileOpen);
+              setOpenedOnPathname(pathname);
+            }}
             className="w-10 h-10 border-2 border-zinc-900 flex items-center justify-center bg-white cursor-pointer"
             aria-label="Toggle menu"
           >
-            {mobileOpen ? <X size={18} strokeWidth={2.5} /> : <Menu size={18} strokeWidth={2.5} />}
+            {mobileOpen ? (
+              <X size={18} strokeWidth={2.5} />
+            ) : (
+              <Menu size={18} strokeWidth={2.5} />
+            )}
           </button>
         </div>
       </nav>
@@ -146,21 +179,30 @@ export default function Header({ user }: { user?: User | null }) {
                 Member Portal
               </Link>
               <div className="flex items-center justify-between py-2 border-b-2 border-zinc-100">
-                <span className="text-label font-black uppercase tracking-widest text-zinc-400">Location</span>
+                <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+                  Location
+                </span>
                 <Suspense fallback={null}>
                   <LocationPill />
                 </Suspense>
               </div>
               <div className="flex items-center justify-between py-2 border-b-2 border-zinc-100">
-                <span className="text-label font-black uppercase tracking-widest text-zinc-400">Text Size</span>
+                <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+                  Text Size
+                </span>
                 <TextScaler />
               </div>
               {user && (
                 <div className="pt-2 space-y-3">
-                  <p className="font-mono text-detail text-zinc-400 uppercase tracking-widest">{user.email}</p>
+                  <p className="font-mono text-detail text-zinc-400 uppercase tracking-widest">
+                    {user.email}
+                  </p>
                   <form action={logoutAction}>
                     <input type="hidden" name="returnTo" value={pathname} />
-                    <button type="submit" className="flex items-center gap-2 text-label font-black uppercase tracking-widest text-red-600 cursor-pointer">
+                    <button
+                      type="submit"
+                      className="flex items-center gap-2 text-label font-black uppercase tracking-widest text-red-600 cursor-pointer"
+                    >
                       <LogOut size={14} /> Logout
                     </button>
                   </form>
