@@ -10,7 +10,7 @@ import {
   type UserLocation,
 } from "@/utils/location-storage";
 
-import { DEFAULT_RADIUS_MILES_MILES } from "@/lib/constants";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
