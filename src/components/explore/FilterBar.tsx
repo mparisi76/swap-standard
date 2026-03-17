@@ -14,6 +14,7 @@ export default function FilterBar() {
     } else {
       params.set("type", type);
     }
+    params.set("page", "1");
     router.push(`${pathname}?${params.toString()}`);
   };
 

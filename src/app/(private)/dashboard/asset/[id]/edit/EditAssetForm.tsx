@@ -7,6 +7,7 @@ import { Loader, MapPin, CheckCircle } from "lucide-react";
 import PhotoUploader, { type InitialPhoto } from "@/components/assets/PhotoUploader";
 import TagSelector from "@/components/assets/TagSelector";
 import { type Asset } from "@/types/schema";
+import { parseTags } from "@/lib/tags";
 
 const ASSET_TYPES = ["goods", "skills", "services"] as const;
 
@@ -32,9 +33,9 @@ export default function EditAssetForm({ asset, initialPhotos }: Props) {
   const [assetStatus, setAssetStatus] = useState(asset.asset_status);
   const [title, setTitle] = useState(asset.title);
   const [offering, setOffering] = useState(asset.offering);
-  const [offeringTags, setOfferingTags] = useState<string[]>(asset.offering_tags ?? []);
+  const [offeringTags, setOfferingTags] = useState<string[]>(parseTags(asset.offering_tags));
   const [seeking, setSeeking] = useState(asset.seeking);
-  const [seekingTags, setSeekingTags] = useState<string[]>(asset.seeking_tags ?? []);
+  const [seekingTags, setSeekingTags] = useState<string[]>(parseTags(asset.seeking_tags));
   const [zip, setZip] = useState("");
   const [newLocationLabel, setNewLocationLabel] = useState("");
   const [zipLoading, setZipLoading] = useState(false);

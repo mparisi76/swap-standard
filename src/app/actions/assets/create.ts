@@ -92,8 +92,8 @@ export async function createAssetAction(
       latitude,
       longitude,
       location_label,
-      offering_tags: offering_tags.length > 0 ? offering_tags : [],
-      seeking_tags: seeking_tags.length > 0 ? seeking_tags : [],
+      offering_tags: offering_tags.length > 0 ? offering_tags.join(",") : null,
+      seeking_tags: seeking_tags.length > 0 ? seeking_tags.join(",") : null,
     }),
   });
 

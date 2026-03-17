@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { parseTags } from "@/lib/tags";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
@@ -8,14 +9,16 @@ const CHAIN_TRADES_ENABLED = process.env.CHAIN_TRADES_ENABLED === "true";
 interface AssetRow {
   id: number;
   user_created: string;
-  offering_tags: string[] | null;
-  seeking_tags: string[] | null;
+  offering_tags: string | null;
+  seeking_tags: string | null;
 }
 
-function tagsOverlap(a: string[] | null, b: string[] | null): boolean {
-  if (!a?.length || !b?.length) return false;
-  const setB = new Set(b.map((t) => t.toLowerCase()));
-  return a.some((t) => setB.has(t.toLowerCase()));
+function tagsOverlap(a: string | null, b: string | null): boolean {
+  const tagsA = parseTags(a);
+  const tagsB = parseTags(b);
+  if (!tagsA.length || !tagsB.length) return false;
+  const setB = new Set(tagsB.map((t) => t.toLowerCase()));
+  return tagsA.some((t) => setB.has(t.toLowerCase()));
 }
 
 /** Canonical key for a triple so (A,B,C) and (B,C,A) are treated as the same cycle */
@@ -56,7 +59,7 @@ export async function POST(req: NextRequest) {
 
   // Filter to assets that have both tag types populated
   const eligible = assets.filter(
-    (a) => a.offering_tags?.length && a.seeking_tags?.length && a.user_created,
+    (a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created,
   );
 
   if (debug) {

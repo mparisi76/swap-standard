@@ -22,8 +22,8 @@ export interface Asset {
   latitude?: number | null;
   longitude?: number | null;
   location_label?: string | null;
-  offering_tags?: string[] | null;
-  seeking_tags?: string[] | null;
+  offering_tags?: string | null;
+  seeking_tags?: string | null;
   // Computed field — not stored in Directus, populated by the assets service
   distance_miles?: number;
 }

@@ -30,6 +30,7 @@ interface ExploreParams {
   limit?: string;
   search?: string;
   type?: string;
+  tag?: string | string[];
   lat?: string;
   lng?: string;
   radius?: string;
@@ -42,10 +43,14 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
   const userLat = params.lat ? parseFloat(params.lat) : undefined;
   const userLng = params.lng ? parseFloat(params.lng) : undefined;
   const radius = params.radius ? parseFloat(params.radius) : 10;
+  const tags = params.tag
+    ? Array.isArray(params.tag) ? params.tag : [params.tag]
+    : undefined;
 
   const { data: items, meta } = await getAssets({
     type: params.type || "all",
     search: searchTerm,
+    tags,
     page: currentPage,
     limit: itemsPerPage,
     userLat,
@@ -53,7 +58,7 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
     radius,
   });
 
-  if (items.length === 0) return <EmptyState activeSearch={searchTerm} />;
+  if (items.length === 0) return <EmptyState activeSearch={searchTerm} activeTags={tags} />;
 
   return (
     <>

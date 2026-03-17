@@ -1,15 +1,22 @@
 "use client";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 
 export default function SearchBar() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  // We read the current search term directly from the URL.
   const initialValue = searchParams.get("search") || "";
+  const hasSearch = Boolean(initialValue);
+
+  const clearSearch = () => {
+    const params = new URLSearchParams(searchParams);
+    params.delete("search");
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  };
 
   const handleSearch = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
@@ -45,9 +52,18 @@ export default function SearchBar() {
         /* Swapped text-sm for text-body to hook into the scaler */
         className="flex-1 px-2 text-body font-bold uppercase tracking-wide outline-none text-zinc-900 placeholder:text-zinc-300"
       />
-      <button 
+      {hasSearch && (
+        <button
+          type="button"
+          onClick={clearSearch}
+          className="px-3 text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+          aria-label="Clear search"
+        >
+          <X size={16} strokeWidth={2.5} />
+        </button>
+      )}
+      <button
         type="submit"
-        /* Swapped text-xs for text-label */
         className="px-6 bg-zinc-900 text-white font-black uppercase tracking-widest text-label hover:bg-emerald-700 transition-colors cursor-pointer"
       >
         Find

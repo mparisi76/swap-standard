@@ -1,19 +1,39 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Asset } from "@/types/schema";
+import { parseTags } from "@/lib/tags";
 
 export default function AssetCard({ asset }: { asset: Asset }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const offeringTags = parseTags(asset.offering_tags);
+  const seekingTags = parseTags(asset.seeking_tags);
+
+  const tagHref = (tag: string) => {
+    const params = new URLSearchParams(searchParams.toString());
+    const current = params.getAll("tag");
+    if (current.includes(tag)) {
+      const remaining = current.filter((t) => t !== tag);
+      params.delete("tag");
+      remaining.forEach((t) => params.append("tag", t));
+    } else {
+      params.append("tag", tag);
+    }
+    params.set("page", "1");
+    return `/explore?${params.toString()}`;
+  };
+
   const isOffering = Boolean(asset.offering);
   const isSeeking  = Boolean(asset.seeking);
   const isSwap     = isOffering && isSeeking;
   const isActive   = asset.asset_status === "available";
 
   return (
-    <Link
-      href={`/explore/${asset.id}`}
-      className={`group flex flex-col border-2 border-zinc-900 bg-white transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]
+    <div
+      onClick={() => router.push(`/explore/${asset.id}`)}
+      className={`group flex flex-col border-2 border-zinc-900 bg-white transition-all hover:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] cursor-pointer
         ${!isActive ? "opacity-60" : ""}
         ${isSwap && isActive ? "border-l-4 border-l-emerald-600" : ""}`}
     >
@@ -58,13 +78,21 @@ export default function AssetCard({ asset }: { asset: Asset }) {
                 {asset.offering}
               </p>
             )}
-            {asset.offering_tags && asset.offering_tags.length > 0 && (
+            {offeringTags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {asset.offering_tags.map((tag) => (
-                  <span key={tag} className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-zinc-300 text-zinc-500">
+                {offeringTags.map((tag) => {
+                  const active = searchParams.getAll("tag").includes(tag);
+                  return (
+                  <a
+                    key={tag}
+                    href={tagHref(tag)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`text-label font-black uppercase tracking-wider px-1.5 py-0.5 border transition-colors ${active ? "border-zinc-900 bg-zinc-900 text-white" : "border-zinc-300 text-zinc-500 hover:border-zinc-900 hover:text-zinc-900"}`}
+                  >
                     {tag}
-                  </span>
-                ))}
+                  </a>
+                  );
+                })}
               </div>
             )}
             {isSeeking && (
@@ -73,18 +101,26 @@ export default function AssetCard({ asset }: { asset: Asset }) {
                 {asset.seeking}
               </p>
             )}
-            {asset.seeking_tags && asset.seeking_tags.length > 0 && (
+            {seekingTags.length > 0 && (
               <div className="flex flex-wrap gap-1">
-                {asset.seeking_tags.map((tag) => (
-                  <span key={tag} className="text-[10px] font-black uppercase tracking-wider px-1.5 py-0.5 border border-emerald-300 text-emerald-700">
+                {seekingTags.map((tag) => {
+                  const active = searchParams.getAll("tag").includes(tag);
+                  return (
+                  <a
+                    key={tag}
+                    href={tagHref(tag)}
+                    onClick={(e) => e.stopPropagation()}
+                    className={`text-label font-black uppercase tracking-wider px-1.5 py-0.5 border transition-colors ${active ? "border-emerald-700 bg-emerald-700 text-white" : "border-emerald-300 text-emerald-700 hover:border-emerald-600 hover:text-emerald-900"}`}
+                  >
                     {tag}
-                  </span>
-                ))}
+                  </a>
+                  );
+                })}
               </div>
             )}
           </div>
         )}
       </div>
-    </Link>
+    </div>
   );
 }

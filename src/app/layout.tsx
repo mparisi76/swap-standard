@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { getValidToken } from "@/lib/auth";
@@ -23,6 +23,12 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  themeColor: "#F9F8F6",
+};
+
 export const metadata: Metadata = {
   metadataBase: new URL(
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com",
@@ -46,6 +52,11 @@ export const metadata: Metadata = {
   robots: {
     index: true,
     follow: true,
+  },
+  formatDetection: {
+    telephone: false,
+    address: false,
+    email: false,
   },
 };
 

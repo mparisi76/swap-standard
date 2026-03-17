@@ -1,3 +1,9 @@
+/** Parse a Directus CSV tag field into a string array. */
+export function parseTags(value: string | null | undefined): string[] {
+  if (!value) return [];
+  return value.split(",").map((t) => t.trim()).filter(Boolean);
+}
+
 export const ALL_TAGS: string[] = [
   // --- TOOLS & HARDWARE ---
   "Hand Tools",
