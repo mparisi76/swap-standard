@@ -9,6 +9,7 @@ import {
   type UserLocation,
 } from "@/utils/location-storage";
 import { lookupZipCode } from "@/utils/geo";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 const DISMISSED_KEY = "location_interstitial_dismissed";
 
@@ -27,7 +28,7 @@ export default function LocationInterstitial() {
     const params = new URLSearchParams(searchParams);
     params.set("lat", String(loc.lat));
     params.set("lng", String(loc.lng));
-    if (!params.get("radius")) params.set("radius", "10");
+    if (!params.get("radius")) params.set("radius", String(DEFAULT_RADIUS_MILES));
     params.set("page", "1");
     router.replace(`${pathname}?${params.toString()}`);
   };
@@ -103,7 +104,7 @@ export default function LocationInterstitial() {
 
         {/* Header */}
         <div className="border-b-4 border-zinc-900 px-8 py-6">
-          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
             Local Exchange
           </span>
           <h2 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
@@ -126,7 +127,7 @@ export default function LocationInterstitial() {
               onKeyDown={(e) => e.key === "Enter" && handleZip()}
               placeholder="Enter ZIP code"
               maxLength={5}
-              className="flex-1 px-5 py-4 text-body font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-300 outline-none bg-transparent"
+              className="flex-1 px-5 py-4 text-body font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-400 outline-none bg-transparent"
             />
             <button
               onClick={handleZip}
@@ -140,7 +141,7 @@ export default function LocationInterstitial() {
           {/* Divider */}
           <div className="flex items-center gap-4">
             <div className="flex-1 border-t border-zinc-300" />
-            <span className="text-label font-black uppercase tracking-widest text-zinc-400">or</span>
+            <span className="text-label font-black uppercase tracking-widest text-zinc-500">or</span>
             <div className="flex-1 border-t border-zinc-300" />
           </div>
 
@@ -168,7 +169,7 @@ export default function LocationInterstitial() {
         <div className="border-t border-zinc-200 px-8 py-4 flex justify-center">
           <button
             onClick={handleSkip}
-            className="text-label text-zinc-400 hover:text-zinc-600 uppercase tracking-widest cursor-pointer transition-colors"
+            className="text-label text-zinc-500 hover:text-zinc-600 uppercase tracking-widest cursor-pointer transition-colors"
           >
             Skip — browse all listings
           </button>

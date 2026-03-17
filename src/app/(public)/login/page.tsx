@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, Suspense, useEffect, useRef } from "react";
+import { useActionState, Suspense, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/actions/auth/login";
@@ -10,12 +10,16 @@ function LoginForm() {
   const [state, formAction, isPending] = useActionState(loginAction, null);
   const searchParams = useSearchParams();
   const turnstileRef = useRef<TurnstileInstance>(null);
+  const [turnstileVerified, setTurnstileVerified] = useState(false);
 
   const isRegistered = searchParams.get("registered") === "true";
   const isExpired = searchParams.get("error") === "session_expired";
 
   useEffect(() => {
-    if (state?.error) turnstileRef.current?.reset();
+    if (state?.error) {
+      turnstileRef.current?.reset();
+      setTurnstileVerified(false);
+    }
   }, [state?.error]);
 
   useEffect(() => {
@@ -66,7 +70,7 @@ function LoginForm() {
         )}
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
             Email
           </label>
           <input
@@ -78,7 +82,7 @@ function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
             Password
           </label>
           <input
@@ -93,10 +97,13 @@ function LoginForm() {
           ref={turnstileRef}
           siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
           options={{ theme: "light" }}
+          onSuccess={() => setTurnstileVerified(true)}
+          onError={() => setTurnstileVerified(false)}
+          onExpire={() => setTurnstileVerified(false)}
         />
 
         <button
-          disabled={isPending}
+          disabled={isPending || !turnstileVerified}
           type="submit"
           className="w-full bg-zinc-900 text-white py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-emerald-700 transition-all disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5"
         >
@@ -121,7 +128,7 @@ export default function LoginPage() {
     <main className="min-h-[80dvh] flex items-center justify-center bg-[#F9F8F6] px-6">
       <Suspense
         fallback={
-          <div className="text-[10px] font-black uppercase tracking-widest text-zinc-400">
+          <div className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
             Loading...
           </div>
         }

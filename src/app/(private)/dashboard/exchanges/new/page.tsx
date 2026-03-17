@@ -1,9 +1,8 @@
 import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ArrowLeft, Loader } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { getValidTokenWithUser } from "@/lib/auth";
-import { initiateExchangeAction, type ExchangeFormState } from "@/app/actions/exchanges/initiate";
 import InitiateExchangeForm from "./InitiateExchangeForm";
 
 export const metadata: Metadata = {
@@ -14,7 +13,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 async function getAssetForExchange(token: string, assetId: string) {
   const res = await fetch(
-    `${BASE_URL}/items/assets/${assetId}?fields=id,title,type,thumbnail,offering,asset_status,user_created`,
+    `${BASE_URL}/items/assets/${assetId}?fields=id,title,type,thumbnail,offering,seeking,asset_status,user_created`,
     { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
   );
   if (!res.ok) return null;
@@ -53,7 +52,7 @@ export default async function NewExchangePage({
             <ArrowLeft size={16} strokeWidth={2.5} />
             Back to Listing
           </Link>
-          <span className="font-mono text-label text-zinc-400 uppercase tracking-widest">
+          <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             New Exchange
           </span>
         </div>
@@ -61,7 +60,7 @@ export default async function NewExchangePage({
 
       <div className="max-w-2xl mx-auto px-6 py-12">
         <header className="border-b-4 border-zinc-900 pb-8 mb-12">
-          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
             Exchanges
           </span>
           <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
@@ -86,7 +85,7 @@ export default async function NewExchangePage({
                 className="w-full h-full object-cover"
               />
             ) : (
-              <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-300 uppercase">
+              <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-400 uppercase">
                 Empty
               </div>
             )}
@@ -100,7 +99,14 @@ export default async function NewExchangePage({
             </h2>
             {asset.offering && (
               <p className="text-detail text-zinc-500 mt-1 line-clamp-2 leading-tight">
+                <span className="font-black uppercase text-zinc-500">Offering: </span>
                 {asset.offering}
+              </p>
+            )}
+            {asset.seeking && (
+              <p className="text-detail text-zinc-500 mt-1 line-clamp-2 leading-tight">
+                <span className="font-black uppercase text-emerald-700">Seeking: </span>
+                {asset.seeking}
               </p>
             )}
           </div>

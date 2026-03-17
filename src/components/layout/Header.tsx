@@ -103,7 +103,7 @@ export default function Header({ user }: { user?: User | null }) {
               </button>
               {profileOpen && (
                 <div className="absolute right-0 mt-3 w-48 bg-white border-2 border-zinc-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-2">
-                  <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-400">
+                  <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-500">
                     {user.email}
                   </div>
                   <Link
@@ -179,7 +179,7 @@ export default function Header({ user }: { user?: User | null }) {
                 Member Portal
               </Link>
               <div className="flex items-center justify-between py-2 border-b-2 border-zinc-100">
-                <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+                <span className="text-label font-black uppercase tracking-widest text-zinc-500">
                   Location
                 </span>
                 <Suspense fallback={null}>
@@ -187,14 +187,14 @@ export default function Header({ user }: { user?: User | null }) {
                 </Suspense>
               </div>
               <div className="flex items-center justify-between py-2 border-b-2 border-zinc-100">
-                <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+                <span className="text-label font-black uppercase tracking-widest text-zinc-500">
                   Text Size
                 </span>
                 <TextScaler />
               </div>
               {user && (
                 <div className="pt-2 space-y-3">
-                  <p className="font-mono text-detail text-zinc-400 uppercase tracking-widest">
+                  <p className="font-mono text-detail text-zinc-500 uppercase tracking-widest">
                     {user.email}
                   </p>
                   <form action={logoutAction}>

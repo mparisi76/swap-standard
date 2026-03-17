@@ -8,10 +8,14 @@ import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
 export default function RegisterPage() {
   const [state, formAction, isPending] = useActionState(registerAction, null);
   const turnstileRef = useRef<TurnstileInstance>(null);
+  const [turnstileVerified, setTurnstileVerified] = useState(false);
 
   // Reset widget whenever the action returns an error so the token stays fresh
   useEffect(() => {
-    if (state?.error) turnstileRef.current?.reset();
+    if (state?.error) {
+      turnstileRef.current?.reset();
+      setTurnstileVerified(false);
+    }
   }, [state?.error]);
 
   // Keep track of form values so they don't vanish
@@ -31,7 +35,7 @@ export default function RegisterPage() {
     <main className="min-h-[calc(100vh-80px)] w-full flex items-center justify-center p-6 bg-[#F9F8F6]">
       <div className="w-full max-w-lg bg-white border-4 border-zinc-900 p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <header className="mb-8">
-          <h1 className="text-2xl font-black uppercase tracking-tighter text-zinc-900">Create Account</h1>
+          <h1 className="text-header font-black uppercase tracking-tighter text-zinc-900">Create Account</h1>
         </header>
 
         <form action={formAction} className="space-y-6">
@@ -73,12 +77,15 @@ export default function RegisterPage() {
             ref={turnstileRef}
             siteKey={process.env.NEXT_PUBLIC_TURNSTILE_SITE_KEY!}
             options={{ theme: "light" }}
+            onSuccess={() => setTurnstileVerified(true)}
+            onError={() => setTurnstileVerified(false)}
+            onExpire={() => setTurnstileVerified(false)}
           />
 
           <button
-            disabled={isPending}
+            disabled={isPending || !turnstileVerified}
             type="submit"
-            className="w-full bg-zinc-900 text-white py-4 font-black uppercase tracking-[0.2em] hover:bg-emerald-700 transition-all disabled:opacity-50"
+            className="w-full bg-zinc-900 text-white py-5 text-[11px] font-black uppercase tracking-[0.3em] hover:bg-emerald-700 transition-all disabled:opacity-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:shadow-none active:translate-x-0.5 active:translate-y-0.5"
           >
             {isPending ? "Registering..." : "Create Account"}
           </button>

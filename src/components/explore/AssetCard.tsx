@@ -46,7 +46,7 @@ export default function AssetCard({ asset }: { asset: Asset }) {
             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
           />
         ) : (
-          <div className="w-full h-full flex items-center justify-center font-mono text-label text-zinc-300 uppercase tracking-widest">
+          <div className="w-full h-full flex items-center justify-center font-mono text-label text-zinc-400 uppercase tracking-widest">
             No Image
           </div>
         )}

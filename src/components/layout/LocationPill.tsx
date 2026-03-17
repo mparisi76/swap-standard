@@ -10,6 +10,7 @@ import {
   type UserLocation,
 } from "@/utils/location-storage";
 import { lookupZipCode } from "@/utils/geo";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 export default function LocationPill() {
   const [location, setLocation] = useState<UserLocation | null>(null);
@@ -45,7 +46,7 @@ export default function LocationPill() {
     if (loc) {
       params.set("lat", String(loc.lat));
       params.set("lng", String(loc.lng));
-      if (!params.get("radius")) params.set("radius", "10");
+      if (!params.get("radius")) params.set("radius", String(DEFAULT_RADIUS_MILES));
     } else {
       params.delete("lat");
       params.delete("lng");
@@ -120,12 +121,12 @@ export default function LocationPill() {
       >
         <MapPin
           size={12}
-          className={location ? "text-emerald-700" : "text-zinc-400"}
+          className={location ? "text-emerald-700" : "text-zinc-500"}
         />
         <span className="text-label font-bold uppercase tracking-wide text-zinc-900 max-w-28 truncate">
           {location ? location.label : "Set location"}
         </span>
-        <ChevronDown size={10} className="text-zinc-400" />
+        <ChevronDown size={10} className="text-zinc-500" />
       </button>
 
       {isOpen && (
@@ -141,7 +142,7 @@ export default function LocationPill() {
               </div>
               <button
                 onClick={handleClear}
-                className="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+                className="text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
                 aria-label="Clear location"
               >
                 <X size={12} />
@@ -150,7 +151,7 @@ export default function LocationPill() {
           )}
 
           <div className="px-4 py-4 space-y-3">
-            <span className="text-label font-black uppercase tracking-[0.2em] text-zinc-400 block">
+            <span className="text-label font-black uppercase tracking-[0.2em] text-zinc-500 block">
               {location ? "Change location" : "Set location"}
             </span>
 
@@ -163,7 +164,7 @@ export default function LocationPill() {
                 onKeyDown={(e) => e.key === "Enter" && handleZip()}
                 placeholder="ZIP code"
                 maxLength={5}
-                className="flex-1 px-3 py-2 text-label font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-300 outline-none"
+                className="flex-1 px-3 py-2 text-label font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-400 outline-none"
               />
               <button
                 onClick={handleZip}

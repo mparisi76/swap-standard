@@ -71,7 +71,7 @@ export default function NewAssetForm() {
 
       {/* Type selector */}
       <div className="space-y-3">
-        <label className="text-label font-black uppercase tracking-widest text-zinc-400 block">
+        <label className="text-label font-black uppercase tracking-widest text-zinc-500 block">
           Type
         </label>
         <div className="flex gap-2">
@@ -104,7 +104,7 @@ export default function NewAssetForm() {
       <div className="space-y-2">
         <label
           htmlFor="title"
-          className="text-label font-black uppercase tracking-widest text-zinc-400 block"
+          className="text-label font-black uppercase tracking-widest text-zinc-500 block"
         >
           Title
         </label>
@@ -115,7 +115,7 @@ export default function NewAssetForm() {
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder="e.g. Cordless drill, Vegetable garden surplus, Tax prep help"
-          className="w-full border-2 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
+          className="w-full border-2 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
         />
         {fieldError("title") && (
           <p className="text-label font-bold text-red-600 uppercase">
@@ -128,7 +128,7 @@ export default function NewAssetForm() {
       <div className="space-y-2">
         <label
           htmlFor="offering"
-          className="text-label font-black uppercase tracking-widest text-zinc-400 block"
+          className="text-label font-black uppercase tracking-widest text-zinc-500 block"
         >
           I&apos;m offering
         </label>
@@ -143,7 +143,7 @@ export default function NewAssetForm() {
           value={offering}
           onChange={(e) => setOffering(e.target.value)}
           placeholder="e.g. A working cordless drill with two batteries. Used but well maintained. Available weekends."
-          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none"
+          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none"
         />
         {fieldError("offering") && (
           <p className="text-label font-bold text-red-600 uppercase">
@@ -165,7 +165,7 @@ export default function NewAssetForm() {
       <div className="space-y-2">
         <label
           htmlFor="seeking"
-          className="text-label font-black uppercase tracking-widest text-zinc-400 block"
+          className="text-label font-black uppercase tracking-widest text-zinc-500 block"
         >
           I&apos;m seeking
         </label>
@@ -179,7 +179,7 @@ export default function NewAssetForm() {
           value={seeking}
           onChange={(e) => setSeeking(e.target.value)}
           placeholder="e.g. Help moving furniture, home-grown produce, or similar tools I'm missing."
-          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none border-l-4 border-l-emerald-600"
+          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none border-l-4 border-l-emerald-600"
         />
         {fieldError("seeking") && (
           <p className="text-label font-bold text-red-600 uppercase">
@@ -200,7 +200,7 @@ export default function NewAssetForm() {
 
       {/* Location */}
       <div className="space-y-2">
-        <label className="text-label font-black uppercase tracking-widest text-zinc-400 block">
+        <label className="text-label font-black uppercase tracking-widest text-zinc-500 block">
           Location
         </label>
         <p className="text-detail text-zinc-500 italic">
@@ -220,7 +220,7 @@ export default function NewAssetForm() {
             }
             placeholder="ZIP code"
             maxLength={5}
-            className="flex-1 border-2 border-r-0 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-300 outline-none bg-white"
+            className="flex-1 border-2 border-r-0 border-zinc-900 px-5 py-4 text-body font-bold text-zinc-900 placeholder:text-zinc-400 outline-none bg-white"
           />
           <button
             type="button"
@@ -254,9 +254,9 @@ export default function NewAssetForm() {
 
       {/* Photos */}
       <div className="space-y-3">
-        <label className="text-label font-black uppercase tracking-widest text-zinc-400 block">
+        <label className="text-label font-black uppercase tracking-widest text-zinc-500 block">
           Photos{" "}
-          <span className="text-zinc-300 normal-case font-bold tracking-normal">
+          <span className="text-zinc-400 normal-case font-bold tracking-normal">
             (optional)
           </span>
         </label>
@@ -265,7 +265,7 @@ export default function NewAssetForm() {
 
       {/* Location note */}
       <div className="border-l-4 border-zinc-300 pl-6 py-1">
-        <p className="text-detail text-zinc-400 italic flex items-center gap-2">
+        <p className="text-detail text-zinc-500 italic flex items-center gap-2">
           <MapPin size={13} />
           Only your general area is shown publicly — never your exact address.
         </p>

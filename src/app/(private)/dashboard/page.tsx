@@ -17,8 +17,8 @@ const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const EXCHANGE_STATUS_BADGE: Record<ExchangeStatus, string> = {
   pending:   "text-amber-600",
   active:    "text-emerald-700",
-  completed: "text-zinc-400",
-  declined:  "text-zinc-400 opacity-60",
+  completed: "text-zinc-500",
+  declined:  "text-zinc-500 opacity-60",
 };
 
 const EXCHANGE_STATUS_LABEL: Record<ExchangeStatus, string> = {
@@ -88,7 +88,7 @@ export default async function DashboardPage() {
       <div className="max-w-5xl mx-auto space-y-10">
 
         <header className="border-b-4 border-zinc-900 pb-6">
-          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
             Member Portal
           </span>
           <h1 className="text-header font-black uppercase italic text-zinc-900">
@@ -110,7 +110,7 @@ export default async function DashboardPage() {
           </Link>
 
           <div className="border-4 border-zinc-900 p-6 md:p-8 bg-white">
-            <Globe size={20} className="mb-3 text-zinc-400" />
+            <Globe size={20} className="mb-3 text-zinc-500" />
             <h2 className="text-body font-black uppercase text-zinc-900">Published</h2>
             <p className="text-[calc(var(--text-header-size)*2)] font-black text-zinc-900 leading-none mt-1">
               {published}
@@ -118,7 +118,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="border-4 border-zinc-900 p-6 md:p-8 bg-white">
-            <FileText size={20} className="mb-3 text-zinc-400" />
+            <FileText size={20} className="mb-3 text-zinc-500" />
             <h2 className="text-body font-black uppercase text-zinc-900">Drafts</h2>
             <p className="text-[calc(var(--text-header-size)*2)] font-black text-zinc-900 leading-none mt-1">
               {drafts}
@@ -126,7 +126,7 @@ export default async function DashboardPage() {
           </div>
 
           <div className="border-4 border-zinc-900 p-6 md:p-8 bg-white">
-            <ArrowLeftRight size={20} className="mb-3 text-zinc-400" />
+            <ArrowLeftRight size={20} className="mb-3 text-zinc-500" />
             <h2 className="text-body font-black uppercase text-zinc-900">Active Trades</h2>
             <p className="text-[calc(var(--text-header-size)*2)] font-black text-zinc-900 leading-none mt-1">
               {activeExchanges}
@@ -137,7 +137,7 @@ export default async function DashboardPage() {
         {/* Active Trades */}
         {exchanges.length > 0 && (
           <section className="space-y-4">
-            <h2 className="text-label font-black uppercase tracking-widest text-zinc-400 border-b-2 border-zinc-900 pb-4">
+            <h2 className="text-label font-black uppercase tracking-widest text-zinc-500 border-b-2 border-zinc-900 pb-4">
               Active Trades
             </h2>
 
@@ -155,22 +155,22 @@ export default async function DashboardPage() {
                       <p className="text-body font-black uppercase text-zinc-900 truncate">
                         {ex.asset.title}
                       </p>
-                      <p className="text-label font-bold uppercase text-zinc-400">
+                      <p className="text-label font-bold uppercase text-zinc-500">
                         With {memberName(counterparty)}
                       </p>
                     </div>
 
                     {/* Status */}
-                    <span className={`text-label font-bold uppercase shrink-0 ${EXCHANGE_STATUS_BADGE[ex.status] ?? "text-zinc-400"}`}>
+                    <span className={`text-label font-bold uppercase shrink-0 ${EXCHANGE_STATUS_BADGE[ex.status] ?? "text-zinc-500"}`}>
                       {EXCHANGE_STATUS_LABEL[ex.status]}
                     </span>
 
                     {/* Date — desktop only */}
-                    <span className="font-mono text-label text-zinc-400 shrink-0 hidden md:block">
+                    <span className="font-mono text-label text-zinc-500 shrink-0 hidden md:block">
                       {new Date(ex.date_updated).toLocaleDateString()}
                     </span>
 
-                    <span className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 shrink-0">
+                    <span className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 shrink-0">
                       Open →
                     </span>
                   </Link>
@@ -182,13 +182,13 @@ export default async function DashboardPage() {
 
         {/* My Listings */}
         <section className="space-y-4">
-          <h2 className="text-label font-black uppercase tracking-widest text-zinc-400 border-b-2 border-zinc-900 pb-4">
+          <h2 className="text-label font-black uppercase tracking-widest text-zinc-500 border-b-2 border-zinc-900 pb-4">
             My Listings
           </h2>
 
           {items.length === 0 ? (
             <div className="border-2 border-zinc-200 bg-white p-10 text-center">
-              <p className="text-body font-bold uppercase text-zinc-400">No listings yet.</p>
+              <p className="text-body font-bold uppercase text-zinc-500">No listings yet.</p>
               <Link
                 href="/dashboard/asset/new"
                 className="inline-block mt-4 text-label font-black uppercase tracking-widest text-emerald-700 border-b border-emerald-700 hover:text-zinc-900 hover:border-zinc-900 transition-all"

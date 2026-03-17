@@ -41,7 +41,7 @@ export default async function SettingsPage() {
             <ArrowLeft size={16} strokeWidth={2.5} />
             Dashboard
           </Link>
-          <span className="font-mono text-label text-zinc-400 uppercase tracking-widest">
+          <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             Settings
           </span>
         </div>
@@ -51,7 +51,7 @@ export default async function SettingsPage() {
         {/* Profile */}
         <section>
           <header className="border-b-4 border-zinc-900 pb-6 mb-8">
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
               Account
             </span>
             <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
@@ -69,7 +69,7 @@ export default async function SettingsPage() {
         {/* Password */}
         <section>
           <header className="border-b-4 border-zinc-900 pb-6 mb-8">
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
               Security
             </span>
             <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">

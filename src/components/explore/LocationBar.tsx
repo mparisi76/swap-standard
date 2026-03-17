@@ -10,8 +10,9 @@ import {
   type UserLocation,
 } from "@/utils/location-storage";
 
+import { DEFAULT_RADIUS_MILES_MILES } from "@/lib/constants";
+
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
-const DEFAULT_RADIUS = 10;
 
 async function lookupZip(zip: string): Promise<UserLocation> {
   const res = await fetch(`https://api.zippopotam.us/us/${zip}`);
@@ -32,7 +33,7 @@ export default function LocationBar() {
 
   const [location, setLocation] = useState<UserLocation | null>(null);
   const [zip, setZip] = useState("");
-  const [radius, setRadius] = useState(DEFAULT_RADIUS);
+  const [radius, setRadius] = useState(DEFAULT_RADIUS_MILES);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const inputRef = useRef<HTMLInputElement>(null);
@@ -111,7 +112,7 @@ export default function LocationBar() {
     clearUserLocation();
     setLocation(null);
     setError("");
-    setRadius(DEFAULT_RADIUS);
+    setRadius(DEFAULT_RADIUS_MILES);
   };
 
   const handleRadiusChange = (r: number) => {
@@ -131,7 +132,7 @@ export default function LocationBar() {
             </span>
             <button
               onClick={handleClear}
-              className="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer ml-1"
+              className="text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer ml-1"
               aria-label="Clear location"
             >
               <X size={14} />
@@ -147,7 +148,7 @@ export default function LocationBar() {
               onKeyDown={(e) => e.key === "Enter" && applyZip()}
               placeholder="Enter ZIP code"
               maxLength={5}
-              className="px-4 py-2 text-label font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-300 outline-none w-36 bg-transparent"
+              className="px-4 py-2 text-label font-bold uppercase tracking-wide text-zinc-900 placeholder:text-zinc-400 outline-none w-36 bg-transparent"
             />
             <button
               onClick={applyZip}
@@ -174,7 +175,7 @@ export default function LocationBar() {
         {/* Radius selector — only shown when location is active */}
         {location && (
           <div className="flex items-center gap-2">
-            <span className="text-label font-black uppercase tracking-widest text-zinc-400">
+            <span className="text-label font-black uppercase tracking-widest text-zinc-500">
               Radius:
             </span>
             <div className="flex gap-1">

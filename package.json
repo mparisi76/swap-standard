@@ -6,7 +6,10 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "seed": "node scripts/seed-listings.mjs",
+    "seed:delete": "node scripts/delete-seed-listings.mjs",
+    "seed:delete:all": "node scripts/delete-seed-listings.mjs --users"
   },
   "dependencies": {
     "@directus/sdk": "^21.2.0",

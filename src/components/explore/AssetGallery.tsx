@@ -43,8 +43,8 @@ export default function AssetGallery({
         {allImages.length === 0 ? (
           /* NO IMAGE PLACEHOLDER */
           <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-100">
-            <ImageIcon className="text-zinc-300 mb-3" size={40} strokeWidth={1} />
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400">
+            <ImageIcon className="text-zinc-400 mb-3" size={40} strokeWidth={1} />
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500">
               No Image
             </span>
           </div>
@@ -54,7 +54,7 @@ export default function AssetGallery({
             {!isLoaded && !isError && (
               <div className="absolute inset-0 flex flex-col items-center justify-center bg-zinc-100">
                 <div className="animate-pulse flex flex-col items-center">
-                  <ImageIcon className="text-zinc-400 mb-2" size={32} strokeWidth={1} />
+                  <ImageIcon className="text-zinc-500 mb-2" size={32} strokeWidth={1} />
                   <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-600">
                     Loading
                   </span>
@@ -81,7 +81,7 @@ export default function AssetGallery({
             {/* ERROR STATE */}
             {isError && (
               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-zinc-100 p-8 text-center">
-                <AlertCircle className="text-zinc-400 mb-3" size={24} />
+                <AlertCircle className="text-zinc-500 mb-3" size={24} />
                 <p className="text-label font-bold uppercase tracking-widest text-zinc-500">
                   Image not available
                 </p>

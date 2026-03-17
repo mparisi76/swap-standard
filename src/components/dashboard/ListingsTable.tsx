@@ -61,12 +61,12 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Search listings..."
-          className="flex-1 px-4 py-2.5 text-body outline-none placeholder:text-zinc-400"
+          className="flex-1 px-4 py-2.5 text-body outline-none placeholder:text-zinc-500"
         />
         {search && (
           <button
             onClick={() => setSearch("")}
-            className="px-4 text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer font-bold"
+            className="px-4 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer font-bold"
           >
             ×
           </button>
@@ -76,7 +76,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
       {/* Filter bar */}
       <div className="flex flex-wrap gap-3">
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="font-mono text-detail uppercase tracking-widest text-zinc-400 shrink-0">Type</span>
+          <span className="font-mono text-detail uppercase tracking-widest text-zinc-500 shrink-0">Type</span>
           <div className="flex gap-1">
             {TYPE_FILTERS.map((f) => (
               <FilterPill key={f} active={typeFilter === f} onClick={() => setTypeFilter(f)}>
@@ -86,7 +86,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
           </div>
         </div>
         <div className="flex items-center gap-2 overflow-x-auto">
-          <span className="font-mono text-detail uppercase tracking-widest text-zinc-400 shrink-0">Status</span>
+          <span className="font-mono text-detail uppercase tracking-widest text-zinc-500 shrink-0">Status</span>
           <div className="flex gap-1">
             {STATUS_FILTERS.map((f) => (
               <FilterPill key={f} active={statusFilter === f} onClick={() => setStatusFilter(f)}>
@@ -98,7 +98,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
         {hasActiveFilters && (
           <button
             onClick={() => { setSearch(""); setTypeFilter("all"); setStatusFilter("all"); }}
-            className="text-detail font-bold uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+            className="text-detail font-bold uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
           >
             Clear
           </button>
@@ -107,7 +107,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
 
       {filtered.length === 0 ? (
         <div className="border-2 border-zinc-200 bg-white p-10 text-center">
-          <p className="text-body font-bold uppercase text-zinc-400">No listings match these filters.</p>
+          <p className="text-body font-bold uppercase text-zinc-500">No listings match these filters.</p>
         </div>
       ) : (
         <div className="border-2 border-zinc-900 bg-white divide-y-2 divide-zinc-100">
@@ -120,15 +120,15 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
               <div className="flex-1 min-w-0 flex items-start justify-between gap-4">
                 <div className="min-w-0">
                   <p className="text-body font-black uppercase text-zinc-900 truncate">{item.title}</p>
-                  <p className="text-label font-bold uppercase text-zinc-400">{item.type}</p>
+                  <p className="text-label font-bold uppercase text-zinc-500">{item.type}</p>
                 </div>
                 {/* Actions — top right on mobile */}
                 <div className="flex md:hidden items-center gap-4 shrink-0">
-                  <Link href={`/dashboard/asset/${item.id}/edit`} className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
+                  <Link href={`/dashboard/asset/${item.id}/edit`} className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">
                     Edit
                   </Link>
                   {item.status === "published" && (
-                    <Link href={`/explore/${item.id}`} className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
+                    <Link href={`/explore/${item.id}`} className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">
                       View →
                     </Link>
                   )}
@@ -138,7 +138,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                       type="submit"
                       title="Delete"
                       onClick={(e) => { if (!confirm(`Delete "${item.title}"?`)) e.preventDefault(); }}
-                      className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+                      className="text-zinc-500 hover:text-red-600 transition-colors cursor-pointer"
                     >
                       <Trash2 size={14} />
                     </button>
@@ -154,24 +154,24 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                 <div className="shrink-0">
                   <AssetStatusSelect assetId={item.id} current={item.asset_status} />
                 </div>
-                <span className="font-mono text-label text-zinc-400 shrink-0 hidden md:block">
+                <span className="font-mono text-label text-zinc-500 shrink-0 hidden md:block">
                   {new Date(item.date_created).toLocaleDateString()}
                 </span>
               </div>
 
               {/* Actions — desktop only */}
               <div className="hidden md:flex items-center gap-4 shrink-0">
-                <Link href={`/dashboard/asset/${item.id}/edit`} className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
+                <Link href={`/dashboard/asset/${item.id}/edit`} className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">
                   Edit
                 </Link>
                 {item.status === "published" && (
-                  <Link href={`/explore/${item.id}`} className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors">
+                  <Link href={`/explore/${item.id}`} className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">
                     View →
                   </Link>
                 )}
                 <form action={duplicateAssetAction}>
                   <input type="hidden" name="assetId" value={item.id} />
-                  <button type="submit" title="Duplicate" className="text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer">
+                  <button type="submit" title="Duplicate" className="text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer">
                     <Copy size={14} />
                   </button>
                 </form>
@@ -181,7 +181,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                     type="submit"
                     title="Delete"
                     onClick={(e) => { if (!confirm(`Delete "${item.title}"?`)) e.preventDefault(); }}
-                    className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+                    className="text-zinc-500 hover:text-red-600 transition-colors cursor-pointer"
                   >
                     <Trash2 size={14} />
                   </button>
@@ -192,7 +192,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
         </div>
       )}
 
-      <p className="font-mono text-detail text-zinc-400 text-right">
+      <p className="font-mono text-detail text-zinc-500 text-right">
         {filtered.length} of {items.length} listings
       </p>
     </div>

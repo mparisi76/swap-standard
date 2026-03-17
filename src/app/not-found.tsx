@@ -7,8 +7,8 @@ export default function NotFound() {
     <main className="flex-1 bg-[#F9F8F6] flex items-center justify-center px-6">
       <div className="max-w-md w-full border-2 border-zinc-900 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
         <div className="border-b-2 border-zinc-900 px-8 py-5 flex items-center justify-between">
-          <span className="font-mono text-detail uppercase tracking-widest text-zinc-400">Status</span>
-          <span className="font-mono text-detail uppercase tracking-widest text-zinc-400">404</span>
+          <span className="font-mono text-detail uppercase tracking-widest text-zinc-500">Status</span>
+          <span className="font-mono text-detail uppercase tracking-widest text-zinc-500">404</span>
         </div>
         <div className="px-8 py-10 space-y-6">
           <div>

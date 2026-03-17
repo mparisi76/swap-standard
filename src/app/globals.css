@@ -4,10 +4,10 @@
   --background: #F9F8F6;
   --foreground: #171717;
   --header-height: 76px;
-  --text-label-size: 0.75rem;
-  --text-detail-size: 0.875rem;
-  --text-body-size: 1rem;
-  --text-header-size: 1.25rem;
+  --text-label-size: 0.6rem;
+  --text-detail-size: 0.7rem;
+  --text-body-size: 0.8rem;
+  --text-header-size: 1.0rem;
 }
 
 @theme {

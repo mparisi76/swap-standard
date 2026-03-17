@@ -12,7 +12,7 @@ export default function ContactPage() {
     <main className="flex-1 flex items-center justify-center bg-[#F9F8F6] px-6 py-20">
       <div className="w-full max-w-lg">
         <header className="border-b-4 border-zinc-900 pb-8 mb-12">
-          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
             Admin
           </span>
           <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
@@ -24,7 +24,7 @@ export default function ContactPage() {
         </header>
 
         <div className="border-2 border-zinc-900 bg-white p-8 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-          <span className="text-label font-black uppercase tracking-[0.2em] text-zinc-400 block mb-4">
+          <span className="text-label font-black uppercase tracking-[0.2em] text-zinc-500 block mb-4">
             Email
           </span>
           <a
@@ -39,7 +39,7 @@ export default function ContactPage() {
         <div className="mt-8 text-center">
           <Link
             href="/"
-            className="text-label font-black uppercase tracking-widest text-zinc-400 hover:text-zinc-900 transition-colors"
+            className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors"
           >
             ← Back to Home
           </Link>

@@ -8,7 +8,7 @@ import { type AssetStatus } from "@/types/schema";
 const STATUS_STYLES: Record<AssetStatus, string> = {
   available:   "text-emerald-700",
   pending:     "text-amber-600",
-  unavailable: "text-zinc-400",
+  unavailable: "text-zinc-500",
 };
 
 export default function AssetStatusSelect({

@@ -13,7 +13,7 @@ export default function AssetDetailLoading() {
         <div className="max-w-5xl mx-auto px-6 py-4 flex items-center justify-between">
           <Link
             href="/explore"
-            className="flex items-center gap-2 text-label font-bold uppercase tracking-widest text-zinc-400"
+            className="flex items-center gap-2 text-label font-bold uppercase tracking-widest text-zinc-500"
           >
             <ArrowLeft size={16} strokeWidth={2.5} />
             Explore

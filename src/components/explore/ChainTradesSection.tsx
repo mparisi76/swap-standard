@@ -100,7 +100,7 @@ export default async function ChainTradesSection({ assetId, currentUserId }: Pro
                 ] as const).map(({ asset, accepted }, idx) => (
                   <div key={idx} className="contents">
                     <div className="min-w-0 flex-1">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-400 leading-none mb-0.5 truncate">
+                      <p className="text-[10px] font-black uppercase tracking-widest text-zinc-500 leading-none mb-0.5 truncate">
                         {userName(asset?.user_created ?? null)}
                       </p>
                       <Link
@@ -109,11 +109,11 @@ export default async function ChainTradesSection({ assetId, currentUserId }: Pro
                         className="inline-flex items-center gap-1 text-detail font-bold text-zinc-900 hover:text-emerald-700 transition-colors group truncate"
                       >
                         <span className="truncate">{asset?.title ?? "—"}</span>
-                        <ExternalLink size={10} className="shrink-0 text-zinc-400 group-hover:text-emerald-600" />
+                        <ExternalLink size={10} className="shrink-0 text-zinc-500 group-hover:text-emerald-600" />
                       </Link>
                       <div className="flex items-center gap-1 mt-0.5">
                         <span className={`w-1.5 h-1.5 border border-zinc-900 shrink-0 ${accepted ? "bg-emerald-500" : "bg-white"}`} />
-                        <span className={`text-[10px] font-black uppercase tracking-wider ${accepted ? "text-emerald-600" : "text-zinc-400"}`}>
+                        <span className={`text-[10px] font-black uppercase tracking-wider ${accepted ? "text-emerald-600" : "text-zinc-500"}`}>
                           {accepted ? "Accepted" : "Waiting"}
                         </span>
                       </div>
@@ -121,7 +121,7 @@ export default async function ChainTradesSection({ assetId, currentUserId }: Pro
                         <p className="text-[10px] text-zinc-600 truncate mt-0.5">{asset.location_label}</p>
                       )}
                     </div>
-                    {idx < 2 && <ArrowRight size={20} className="text-zinc-400 shrink-0 mx-2" strokeWidth={2} />}
+                    {idx < 2 && <ArrowRight size={20} className="text-zinc-500 shrink-0 mx-2" strokeWidth={2} />}
                   </div>
                 ))}
               </div>

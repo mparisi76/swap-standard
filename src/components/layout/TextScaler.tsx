@@ -14,10 +14,10 @@ export default function TextScaler() {
 
   useEffect(() => {
     const root = document.documentElement.style;
-    root.setProperty('--text-label-size', `${0.75 * scale}rem`);
-    root.setProperty('--text-detail-size', `${0.875 * scale}rem`);
-    root.setProperty('--text-body-size', `${1.0 * scale}rem`);
-    root.setProperty('--text-header-size', `${1.25 * scale}rem`);
+    root.setProperty('--text-label-size', `${0.6 * scale}rem`);
+    root.setProperty('--text-detail-size', `${0.7 * scale}rem`);
+    root.setProperty('--text-body-size', `${0.8 * scale}rem`);
+    root.setProperty('--text-header-size', `${1.0 * scale}rem`);
     localStorage.setItem('text-scale', String(scale));
   }, [scale]);
 

@@ -54,7 +54,7 @@ export default function Pagination({
         p === "..." ? (
           <span
             key={`ellipsis-${i}`}
-            className="w-9 h-9 flex items-center justify-center font-mono text-label text-zinc-400"
+            className="w-9 h-9 flex items-center justify-center font-mono text-label text-zinc-500"
           >
             …
           </span>
@@ -82,7 +82,7 @@ export default function Pagination({
         <ChevronRight size={14} strokeWidth={2.5} />
       </button>
 
-      <span className="ml-4 font-mono text-label text-zinc-400 uppercase tracking-widest">
+      <span className="ml-4 font-mono text-label text-zinc-500 uppercase tracking-widest">
         {totalCount} entries
       </span>
     </div>

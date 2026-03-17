@@ -4,6 +4,7 @@ import { readItems, aggregate } from "@directus/sdk";
 import { cache } from "react";
 import { haversineDistance, boundingBox } from "@/utils/geo";
 import { parseTags } from "@/lib/tags";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 type DirectusFilter = Record<string, unknown>;
 
@@ -15,7 +16,7 @@ const buildFilters = (params: {
   userLng?: number;
   radius?: number;
 }) => {
-  const { type, search, userLat, userLng, radius = 10 } = params;
+  const { type, search, userLat, userLng, radius = DEFAULT_RADIUS_MILES } = params;
 
   const andFilters: DirectusFilter[] = [{ status: { _eq: "published" } }];
 

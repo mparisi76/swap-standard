@@ -66,7 +66,7 @@ export default async function HomePage() {
                     name="search"
                     type="text"
                     placeholder="Search for tools, skills, or items..."
-                    className="flex-1 px-6 py-5 text-body outline-none placeholder:text-zinc-400"
+                    className="flex-1 px-6 py-5 text-body outline-none placeholder:text-zinc-500"
                   />
                   <button
                     type="submit"

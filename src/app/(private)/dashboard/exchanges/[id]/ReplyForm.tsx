@@ -31,7 +31,7 @@ export default function ReplyForm({ exchangeId }: { exchangeId: number }) {
         rows={3}
         maxLength={2000}
         placeholder="Write a message..."
-        className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none"
+        className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none"
       />
       <div className="flex justify-end">
         <button

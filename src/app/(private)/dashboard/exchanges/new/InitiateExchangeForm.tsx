@@ -29,7 +29,7 @@ export default function InitiateExchangeForm({ assetId }: { assetId: string }) {
       <div className="space-y-2">
         <label
           htmlFor="message"
-          className="text-label font-black uppercase tracking-widest text-zinc-400 block"
+          className="text-label font-black uppercase tracking-widest text-zinc-500 block"
         >
           Opening Message
         </label>
@@ -44,7 +44,7 @@ export default function InitiateExchangeForm({ assetId }: { assetId: string }) {
           value={message}
           onChange={(e) => setMessage(e.target.value)}
           placeholder="Hi, I saw your listing and I'd like to offer..."
-          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none border-l-4 border-l-emerald-600"
+          className="w-full border-2 border-zinc-900 px-5 py-4 text-body text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white resize-none border-l-4 border-l-emerald-600"
         />
       </div>
 

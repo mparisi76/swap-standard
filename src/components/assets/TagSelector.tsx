@@ -69,7 +69,7 @@ export default function TagSelector({ selected, onChange, name, placeholder = "T
               <button
                 type="button"
                 onClick={() => remove(tag)}
-                className="hover:text-zinc-300 transition-colors cursor-pointer"
+                className="hover:text-zinc-400 transition-colors cursor-pointer"
               >
                 <X size={10} strokeWidth={3} />
               </button>
@@ -80,7 +80,7 @@ export default function TagSelector({ selected, onChange, name, placeholder = "T
 
       {/* Input */}
       {atLimit ? (
-        <p className="text-detail font-bold text-zinc-400 uppercase tracking-wide">
+        <p className="text-detail font-bold text-zinc-500 uppercase tracking-wide">
           Max {MAX_TAGS} tags
         </p>
       ) : (
@@ -91,7 +91,7 @@ export default function TagSelector({ selected, onChange, name, placeholder = "T
           onFocus={() => query.trim().length > 0 && setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder={placeholder}
-          className="w-full border-2 border-zinc-900 px-4 py-3 text-body text-zinc-900 placeholder:text-zinc-300 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
+          className="w-full border-2 border-zinc-900 px-4 py-3 text-body text-zinc-900 placeholder:text-zinc-400 outline-none focus:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-shadow bg-white"
         />
       )}
 
@@ -100,7 +100,7 @@ export default function TagSelector({ selected, onChange, name, placeholder = "T
         <ul className="absolute z-10 top-full left-0 right-0 border-2 border-t-0 border-zinc-900 bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           {noResults && (
             <li className="px-4 pt-3 pb-1">
-              <p className="text-detail text-zinc-400 italic">
+              <p className="text-detail text-zinc-500 italic">
                 No matching tags for &ldquo;{trimmedQuery}&rdquo;.
               </p>
             </li>

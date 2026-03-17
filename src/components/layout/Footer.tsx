@@ -26,7 +26,7 @@ export default function Footer() {
 
           {/* Navigation */}
           <div>
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-4">
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-4">
               Explore
             </span>
             <nav className="space-y-2">
@@ -59,7 +59,7 @@ export default function Footer() {
 
           {/* Ethos */}
           <div>
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-4">
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-4">
               Duty of Care
             </span>
             <p className="text-detail text-zinc-500 leading-relaxed italic">
@@ -71,7 +71,7 @@ export default function Footer() {
 
         {/* Bottom bar */}
         <div className="pt-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-3">
-          <span className="font-mono text-label text-zinc-400 uppercase tracking-widest">
+          <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             &copy; {year} SwapStandard — All exchanges logged.
           </span>
         </div>

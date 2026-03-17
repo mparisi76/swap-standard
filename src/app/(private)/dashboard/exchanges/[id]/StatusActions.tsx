@@ -16,7 +16,7 @@ const STATUS_COLOUR: Record<ExchangeStatus, string> = {
   pending:   "text-amber-600 border-amber-600",
   active:    "text-emerald-700 border-emerald-700",
   completed: "text-zinc-500 border-zinc-300",
-  declined:  "text-zinc-400 border-zinc-200",
+  declined:  "text-zinc-500 border-zinc-200",
 };
 
 export default function StatusActions({

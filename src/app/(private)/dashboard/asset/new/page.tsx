@@ -21,7 +21,7 @@ export default function NewAssetPage() {
             <ArrowLeft size={16} strokeWidth={2.5} />
             Dashboard
           </Link>
-          <span className="font-mono text-label text-zinc-400 uppercase tracking-widest">
+          <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             New Entry
           </span>
         </div>
@@ -29,7 +29,7 @@ export default function NewAssetPage() {
 
       <div className="max-w-2xl mx-auto px-6 py-12">
         <header className="border-b-4 border-zinc-900 pb-8 mb-12">
-          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-400 block mb-2">
+          <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
             Listings
           </span>
           <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">

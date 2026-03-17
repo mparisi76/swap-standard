@@ -130,7 +130,7 @@ export default async function AssetDetailPage({
             <ArrowLeft size={16} strokeWidth={2.5} />
             Explore
           </Link>
-          <span className="font-mono text-label text-zinc-400">
+          <span className="font-mono text-label text-zinc-500">
             REF—{String(asset.id).padStart(6, "0")}
           </span>
         </div>
@@ -164,9 +164,9 @@ export default async function AssetDetailPage({
 
               <div className="flex gap-10 pt-6">
                 <div className="flex items-center gap-4">
-                  <Tag size={18} className="text-zinc-400" />
+                  <Tag size={18} className="text-zinc-500" />
                   <div className="flex flex-col">
-                    <span className="text-label font-black uppercase text-zinc-400 leading-none">
+                    <span className="text-label font-black uppercase text-zinc-500 leading-none">
                       Category
                     </span>
                     <span className="text-body font-bold text-zinc-900 uppercase">
@@ -175,9 +175,9 @@ export default async function AssetDetailPage({
                   </div>
                 </div>
                 <div className="flex items-center gap-4">
-                  <Clock size={18} className="text-zinc-400" />
+                  <Clock size={18} className="text-zinc-500" />
                   <div className="flex flex-col">
-                    <span className="text-label font-black uppercase text-zinc-400 leading-none">
+                    <span className="text-label font-black uppercase text-zinc-500 leading-none">
                       Logged Date
                     </span>
                     <span className="text-body font-bold text-zinc-900 uppercase">
@@ -190,7 +190,7 @@ export default async function AssetDetailPage({
 
             <div className="space-y-8">
               <div className="space-y-2">
-                <label className="text-label font-black uppercase text-zinc-400">
+                <label className="text-label font-black uppercase text-zinc-500">
                   I&apos;m offering:
                 </label>
                 <p className="text-body text-zinc-900 leading-relaxed">
@@ -199,7 +199,7 @@ export default async function AssetDetailPage({
               </div>
 
               <div className="space-y-2">
-                <label className="text-label font-black uppercase text-zinc-400">
+                <label className="text-label font-black uppercase text-zinc-500">
                   I&apos;m seeking:
                 </label>
                 <p className="text-body font-bold text-zinc-900 leading-relaxed border-l-4 border-emerald-600 pl-6">

@@ -5,6 +5,7 @@ import SearchBar from "@/components/explore/SearchBar";
 import FilterBar from "@/components/explore/FilterBar";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { X } from "lucide-react";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
 
@@ -34,7 +35,7 @@ function ActiveTagsBar() {
 
   return (
     <div className="px-4 lg:px-6 pb-2 flex items-center gap-2 flex-wrap">
-      <span className="text-label font-black uppercase tracking-widest text-zinc-400 shrink-0">
+      <span className="text-label font-black uppercase tracking-widest text-zinc-500 shrink-0">
         Tags:
       </span>
       {activeTags.map((tag) => (
@@ -50,7 +51,7 @@ function ActiveTagsBar() {
       {activeTags.length > 1 && (
         <button
           onClick={clearAll}
-          className="text-label font-black uppercase tracking-wider text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+          className="text-label font-black uppercase tracking-wider text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
         >
           Clear all
         </button>
@@ -65,7 +66,7 @@ function RadiusFilter() {
   const searchParams = useSearchParams();
 
   const hasLocation = Boolean(searchParams.get("lat"));
-  const currentRadius = Number(searchParams.get("radius") || 10);
+  const currentRadius = Number(searchParams.get("radius") || DEFAULT_RADIUS_MILES);
 
   if (!hasLocation) return null;
 
@@ -78,7 +79,7 @@ function RadiusFilter() {
 
   return (
     <div className="flex w-full lg:w-auto lg:shrink-0 lg:items-center lg:gap-2">
-      <span className="hidden lg:block text-label font-black uppercase tracking-widest text-zinc-400 shrink-0">
+      <span className="hidden lg:block text-label font-black uppercase tracking-widest text-zinc-500 shrink-0">
         Within:
       </span>
       {RADIUS_OPTIONS.map((r) => (

@@ -89,7 +89,7 @@ export default async function ExchangeThreadPage({
             <ArrowLeft size={16} strokeWidth={2.5} />
             Dashboard
           </Link>
-          <span className="font-mono text-label text-zinc-400 uppercase tracking-widest">
+          <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             Exch—{String(ex.id).padStart(6, "0")}
           </span>
         </div>
@@ -119,7 +119,7 @@ export default async function ExchangeThreadPage({
                     className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                   />
                 ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-300 uppercase">
+                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-400 uppercase">
                     Empty
                   </div>
                 )}
@@ -141,17 +141,17 @@ export default async function ExchangeThreadPage({
             <div className="p-5 space-y-4">
               <div className="flex flex-wrap gap-6 text-label font-mono text-zinc-500">
                 <div>
-                  <span className="font-black uppercase text-zinc-400 block tracking-widest">With</span>
+                  <span className="font-black uppercase text-zinc-500 block tracking-widest">With</span>
                   <span className="text-zinc-900 font-bold">{memberName(counterparty)}</span>
                 </div>
                 <div>
-                  <span className="font-black uppercase text-zinc-400 block tracking-widest">Initiated</span>
+                  <span className="font-black uppercase text-zinc-500 block tracking-widest">Initiated</span>
                   <span className="text-zinc-900 font-bold">
                     {new Date(ex.date_created).toLocaleDateString()}
                   </span>
                 </div>
                 <div>
-                  <span className="font-black uppercase text-zinc-400 block tracking-widest">Updated</span>
+                  <span className="font-black uppercase text-zinc-500 block tracking-widest">Updated</span>
                   <span className="text-zinc-900 font-bold">
                     {new Date(ex.date_updated).toLocaleDateString()}
                   </span>
@@ -165,14 +165,14 @@ export default async function ExchangeThreadPage({
         {/* Message section — fills all remaining height */}
         <div className="flex-1 min-h-0 max-w-2xl mx-auto w-full px-6 pb-6 flex flex-col">
           <section className="border-2 border-zinc-900 bg-white flex flex-col flex-1 min-h-0">
-            <h2 className="text-label font-black uppercase tracking-widest text-zinc-400 border-b-2 border-zinc-900 px-6 py-4 shrink-0">
+            <h2 className="text-label font-black uppercase tracking-widest text-zinc-500 border-b-2 border-zinc-900 px-6 py-4 shrink-0">
               Messages
             </h2>
 
             {/* Scrollable message list */}
             <div className="overflow-y-auto flex-1 px-6 py-6">
               {messages.length === 0 ? (
-                <p className="text-detail text-zinc-400 italic">No messages yet.</p>
+                <p className="text-detail text-zinc-500 italic">No messages yet.</p>
               ) : (
                 <div className="space-y-4">
                   {messages.map((msg) => {
@@ -183,7 +183,7 @@ export default async function ExchangeThreadPage({
                           <span className={`font-mono text-label font-bold ${isMe ? "text-zinc-900" : "text-emerald-700"}`}>
                             {isMe ? "You" : memberName(msg.sender)}
                           </span>
-                          <span className="font-mono text-detail text-zinc-400">
+                          <span className="font-mono text-detail text-zinc-500">
                             {new Date(msg.date_created).toLocaleString()}
                           </span>
                         </div>
@@ -198,7 +198,7 @@ export default async function ExchangeThreadPage({
             {/* Reply form — always anchored at bottom */}
             {!isClosed && (
               <div className="border-t-2 border-zinc-900 px-6 py-5 space-y-3 bg-[#F9F8F6] shrink-0">
-                <p className="text-detail text-zinc-400 italic">
+                <p className="text-detail text-zinc-500 italic">
                   Refresh to see new messages from the other party.
                 </p>
                 <ReplyForm exchangeId={ex.id} />

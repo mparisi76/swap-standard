@@ -181,15 +181,15 @@ export default function PhotoUploader({ initialPhotos }: { initialPhotos?: Initi
           onClick={() => fileInputRef.current?.click()}
           className="aspect-square border-2 border-dashed border-zinc-400 bg-white hover:border-zinc-900 hover:bg-zinc-50 transition-all flex flex-col items-center justify-center gap-1 cursor-pointer group"
         >
-          <Plus size={20} className="text-zinc-400 group-hover:text-zinc-900 transition-colors" />
-          <span className="text-[9px] font-black uppercase tracking-widest text-zinc-400 group-hover:text-zinc-900 transition-colors">
+          <Plus size={20} className="text-zinc-500 group-hover:text-zinc-900 transition-colors" />
+          <span className="text-[9px] font-black uppercase tracking-widest text-zinc-500 group-hover:text-zinc-900 transition-colors">
             Add
           </span>
         </button>
       </div>
 
       {photos.length > 0 && (
-        <p className="text-label text-zinc-400 font-bold uppercase tracking-wide">
+        <p className="text-label text-zinc-500 font-bold uppercase tracking-wide">
           {photos.length} photo{photos.length !== 1 ? "s" : ""} — drag to reorder — first photo is the main image
         </p>
       )}

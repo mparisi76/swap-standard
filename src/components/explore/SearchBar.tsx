@@ -41,7 +41,7 @@ export default function SearchBar() {
       key={initialValue} // This forces the input to reset if the URL changes externally
       className="flex h-9.5 border-2 border-zinc-900 bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] transition-all focus-within:shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
     >
-      <div className="flex items-center px-3 text-zinc-400">
+      <div className="flex items-center px-3 text-zinc-500">
         {/* Hard-locked size so the icon doesn't scale with text */}
         <Search size={20} strokeWidth={2.5} />
       </div>
@@ -50,13 +50,13 @@ export default function SearchBar() {
         defaultValue={initialValue}
         placeholder="Search for tools, skills, or items..."
         /* Swapped text-sm for text-body to hook into the scaler */
-        className="flex-1 px-2 text-body font-bold uppercase tracking-wide outline-none text-zinc-900 placeholder:text-zinc-300"
+        className="flex-1 px-2 text-body font-bold uppercase tracking-wide outline-none text-zinc-900 placeholder:text-zinc-400"
       />
       {hasSearch && (
         <button
           type="button"
           onClick={clearSearch}
-          className="px-3 text-zinc-400 hover:text-zinc-900 transition-colors cursor-pointer"
+          className="px-3 text-zinc-500 hover:text-zinc-900 transition-colors cursor-pointer"
           aria-label="Clear search"
         >
           <X size={16} strokeWidth={2.5} />

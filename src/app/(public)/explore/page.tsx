@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { type Metadata } from "next";
 import AssetCard from "@/components/explore/AssetCard";
 import { getAssets } from "@/services/(public)/assets";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 import EmptyState from "@/components/shared/EmptyState";
 import ControlBar from "@/components/explore/ControlBar";
 import LocationInterstitial from "@/components/explore/LocationInterstitial";
@@ -42,7 +43,7 @@ async function ResourceFeed({ params }: { params: ExploreParams }) {
   const searchTerm = params.search || "";
   const userLat = params.lat ? parseFloat(params.lat) : undefined;
   const userLng = params.lng ? parseFloat(params.lng) : undefined;
-  const radius = params.radius ? parseFloat(params.radius) : 10;
+  const radius = params.radius ? parseFloat(params.radius) : DEFAULT_RADIUS_MILES;
   const tags = params.tag
     ? Array.isArray(params.tag) ? params.tag : [params.tag]
     : undefined;
