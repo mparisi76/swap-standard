@@ -14,13 +14,19 @@ export async function POST(req: NextRequest) {
   // Use request origin so this works in both dev (localhost) and production
   const origin = req.headers.get("origin") ?? process.env.NEXT_PUBLIC_SITE_URL!;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "payment",
-    line_items: [{ price: process.env.STRIPE_FEATURED_PRICE_ID!, quantity: 1 }],
-    metadata: { asset_id: String(assetId), user_id: auth.userId },
-    success_url: `${origin}/dashboard/featured/success?asset=${assetId}`,
-    cancel_url: `${origin}/dashboard`,
-  });
-
-  return NextResponse.json({ url: session.url });
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "payment",
+      payment_method_types: ["card"],
+      line_items: [{ price: process.env.STRIPE_FEATURED_PRICE_ID!, quantity: 1 }],
+      metadata: { asset_id: String(assetId), user_id: auth.userId },
+      success_url: `${origin}/dashboard/featured/success?asset=${assetId}`,
+      cancel_url: `${origin}/dashboard`,
+    });
+    return NextResponse.json({ url: session.url });
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[checkout/featured]", message);
+    return NextResponse.json({ error: message }, { status: 500 });
+  }
 }
