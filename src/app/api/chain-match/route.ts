@@ -1,16 +1,25 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseTags } from "@/lib/tags";
+import { haversineDistance } from "@/utils/geo";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 const CHAIN_MATCH_SECRET = process.env.CHAIN_MATCH_SECRET!;
 const CHAIN_TRADES_ENABLED = process.env.CHAIN_TRADES_ENABLED === "true";
+const MAX_DISTANCE_MILES = 50;
 
 interface AssetRow {
   id: number;
   user_created: string;
   offering_tags: string | null;
   seeking_tags: string | null;
+  latitude: number | null;
+  longitude: number | null;
+}
+
+function withinDistance(a: AssetRow, b: AssetRow): boolean {
+  if (a.latitude == null || a.longitude == null || b.latitude == null || b.longitude == null) return false;
+  return haversineDistance(a.latitude, a.longitude, b.latitude, b.longitude) <= MAX_DISTANCE_MILES;
 }
 
 function tagsOverlap(a: string | null, b: string | null): boolean {
@@ -42,9 +51,10 @@ export async function POST(req: NextRequest) {
   // 1. Fetch all published assets with tag data
   const assetsUrl = new URL(`${BASE_URL}/items/assets`);
   assetsUrl.searchParams.set("filter[status][_eq]", "published");
-  assetsUrl.searchParams.set("fields", "id,user_created,offering_tags,seeking_tags");
+  assetsUrl.searchParams.set("fields", "id,user_created,offering_tags,seeking_tags,latitude,longitude");
   assetsUrl.searchParams.set("limit", "-1");
 
+  console.log("[chain-match] fetching assets...");
   const assetsRes = await fetch(assetsUrl.toString(), {
     headers: { Authorization: `Bearer ${STATIC_TOKEN}` },
     cache: "no-store",
@@ -56,11 +66,13 @@ export async function POST(req: NextRequest) {
   }
 
   const { data: assets }: { data: AssetRow[] } = await assetsRes.json();
+  console.log(`[chain-match] fetched ${assets.length} assets`);
 
   // Filter to assets that have both tag types populated
   const eligible = assets.filter(
     (a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created,
   );
+  console.log(`[chain-match] ${eligible.length} eligible assets`);
 
   if (debug) {
     return NextResponse.json({
@@ -75,11 +87,13 @@ export async function POST(req: NextRequest) {
   }
 
   // 2. Fetch existing suggested chain_trades to avoid duplicates
+  console.log("[chain-match] fetching existing chain trades...");
   const existingRes = await fetch(
     `${BASE_URL}/items/chain_trades?filter[chain_status][_eq]=suggested&fields=asset_a,asset_b,asset_c&limit=-1`,
     { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
   );
 
+  console.log(`[chain-match] existing trades fetch status: ${existingRes.status}`);
   const existingKeys = new Set<string>();
   if (existingRes.ok) {
     const { data: existing }: { data: { asset_a: number; asset_b: number; asset_c: number }[] } =
@@ -93,19 +107,55 @@ export async function POST(req: NextRequest) {
   //    A→B: B.offering_tags ∩ A.seeking_tags ≠ ∅
   //    B→C: C.offering_tags ∩ B.seeking_tags ≠ ∅
   //    C→A: A.offering_tags ∩ C.seeking_tags ≠ ∅
+  //
+  // Build a lookup: tag → assets that offer it, for O(n) lookup instead of O(n³)
+  const offeringIndex = new Map<string, AssetRow[]>();
+  for (const asset of eligible) {
+    for (const tag of parseTags(asset.offering_tags).map((t) => t.toLowerCase())) {
+      if (!offeringIndex.has(tag)) offeringIndex.set(tag, []);
+      offeringIndex.get(tag)!.push(asset);
+    }
+  }
+
+  const MAX_NEW_CYCLES = 500;
   const newCycles: { asset_a: number; asset_b: number; asset_c: number; user_a: string; user_b: string; user_c: string }[] = [];
   const seenKeys = new Set<string>(existingKeys);
 
   for (const a of eligible) {
-    for (const b of eligible) {
-      if (b.id === a.id || b.user_created === a.user_created) continue;
-      if (!tagsOverlap(b.offering_tags, a.seeking_tags)) continue;
+    const aSeekingTags = parseTags(a.seeking_tags).map((t) => t.toLowerCase());
+    const aOfferingTags = parseTags(a.offering_tags).map((t) => t.toLowerCase());
 
-      for (const c of eligible) {
-        if (c.id === a.id || c.id === b.id) continue;
-        if (c.user_created === a.user_created || c.user_created === b.user_created) continue;
-        if (!tagsOverlap(c.offering_tags, b.seeking_tags)) continue;
-        if (!tagsOverlap(a.offering_tags, c.seeking_tags)) continue;
+    // Find all B candidates: assets that offer something A seeks, within distance
+    const bCandidates = new Map<number, AssetRow>();
+    for (const tag of aSeekingTags) {
+      for (const b of offeringIndex.get(tag) ?? []) {
+        if (b.id !== a.id && b.user_created !== a.user_created && withinDistance(a, b)) {
+          bCandidates.set(b.id, b);
+        }
+      }
+    }
+
+    for (const b of bCandidates.values()) {
+      const bSeekingTags = parseTags(b.seeking_tags).map((t) => t.toLowerCase());
+
+      // Find all C candidates: assets that offer something B seeks, within distance of both A and B
+      const cCandidates = new Map<number, AssetRow>();
+      for (const tag of bSeekingTags) {
+        for (const c of offeringIndex.get(tag) ?? []) {
+          if (
+            c.id !== a.id && c.id !== b.id &&
+            c.user_created !== a.user_created && c.user_created !== b.user_created &&
+            withinDistance(b, c) && withinDistance(a, c)
+          ) {
+            cCandidates.set(c.id, c);
+          }
+        }
+      }
+
+      for (const c of cCandidates.values()) {
+        // Check C→A: A offers something C seeks
+        const cSeekingTags = new Set(parseTags(c.seeking_tags).map((t) => t.toLowerCase()));
+        if (!aOfferingTags.some((t) => cSeekingTags.has(t))) continue;
 
         const key = cycleKey(a.id, b.id, c.id);
         if (seenKeys.has(key)) continue;
@@ -119,23 +169,28 @@ export async function POST(req: NextRequest) {
           user_b: b.user_created,
           user_c: c.user_created,
         });
+
+        if (newCycles.length >= MAX_NEW_CYCLES) break;
       }
+      if (newCycles.length >= MAX_NEW_CYCLES) break;
     }
+    if (newCycles.length >= MAX_NEW_CYCLES) break;
   }
 
-  // 4. Write new chain_trades
+  // 4. Write new chain_trades in one batch request
+  console.log(`[chain-match] found ${newCycles.length} new cycles, writing...`);
   let written = 0;
-  for (const cycle of newCycles) {
+  if (newCycles.length > 0) {
     const res = await fetch(`${BASE_URL}/items/chain_trades`, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${STATIC_TOKEN}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ ...cycle, chain_status: "suggested" }),
+      body: JSON.stringify(newCycles.map((cycle) => ({ ...cycle, chain_status: "suggested" }))),
     });
-    if (res.ok) written++;
-    else console.error("Failed to write chain_trade:", await res.text());
+    if (res.ok) written = newCycles.length;
+    else console.error("Failed to write chain_trades:", await res.text());
   }
 
   return NextResponse.json({

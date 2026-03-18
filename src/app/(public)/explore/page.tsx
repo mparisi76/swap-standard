@@ -8,6 +8,7 @@ import ControlBar from "@/components/explore/ControlBar";
 import LocationInterstitial from "@/components/explore/LocationInterstitial";
 import { AssetFeedSkeleton } from "@/components/explore/AssetCardSkeleton";
 import Pagination from "@/components/explore/Pagination";
+import LocationPrompt from "@/components/explore/LocationPrompt";
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com";
 
@@ -94,6 +95,7 @@ export default async function ExplorePage({
       <Suspense fallback={null}>
         <LocationInterstitial />
       </Suspense>
+      <LocationPrompt />
       <ControlBar />
 
       <div className="max-w-400 mx-auto px-6 py-8">

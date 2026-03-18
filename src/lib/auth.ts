@@ -1,4 +1,4 @@
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
@@ -30,10 +30,15 @@ async function attemptRefresh(cookieStore: Awaited<ReturnType<typeof cookies>>):
 }
 
 /**
- * Returns a valid Directus access token, refreshing it if expired.
- * Returns null if no session exists or refresh fails.
+ * Returns a valid Directus access token.
+ * On dashboard routes, middleware forwards the pre-validated token via header.
+ * On API routes (outside middleware), validates and refreshes as needed.
  */
 export async function getValidToken(): Promise<string | null> {
+  const headerStore = await headers();
+  const forwarded = headerStore.get("x-auth-token");
+  if (forwarded) return forwarded;
+
   const cookieStore = await cookies();
   const token = cookieStore.get("directus_session")?.value;
   if (!token) return null;
@@ -48,10 +53,20 @@ export async function getValidToken(): Promise<string | null> {
 }
 
 /**
- * Returns a valid token AND the current user's ID in one call,
- * avoiding the double /users/me hit when both are needed.
+ * Returns a valid token + the current user's ID.
+ * On dashboard routes, both are forwarded by middleware — no extra fetch needed.
+ * On API routes, validates and refreshes as needed.
  */
 export async function getValidTokenWithUser(): Promise<{ token: string; userId: string } | null> {
+  const headerStore = await headers();
+  const forwardedToken = headerStore.get("x-auth-token");
+  const forwardedUserId = headerStore.get("x-auth-user-id");
+
+  if (forwardedToken && forwardedUserId) {
+    return { token: forwardedToken, userId: forwardedUserId };
+  }
+
+  // API route — validate independently
   const cookieStore = await cookies();
   let token = cookieStore.get("directus_session")?.value;
   if (!token) return null;
@@ -62,7 +77,7 @@ export async function getValidTokenWithUser(): Promise<{ token: string; userId: 
   });
 
   if (!check.ok) {
-    token = await attemptRefresh(cookieStore) ?? undefined;
+    token = (await attemptRefresh(cookieStore)) ?? undefined;
     if (!token) return null;
 
     check = await fetch(`${BASE_URL}/users/me?fields=id`, {

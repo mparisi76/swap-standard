@@ -2,6 +2,7 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { ArrowLeft } from "lucide-react";
+import AssetThumbnail from "@/components/assets/AssetThumbnail";
 import { getValidTokenWithUser } from "@/lib/auth";
 import InitiateExchangeForm from "./InitiateExchangeForm";
 
@@ -74,21 +75,7 @@ export default async function NewExchangePage({
         {/* Asset context card */}
         <div className="border-2 border-zinc-900 bg-white p-5 flex gap-4 mb-10 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
           <div className="w-20 h-20 shrink-0 border-2 border-zinc-900 bg-zinc-100 overflow-hidden relative">
-            <div className="absolute top-0 right-0 bg-zinc-900 text-white text-[8px] px-1 font-mono uppercase z-10">
-              IMG
-            </div>
-            {asset.thumbnail ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={`${BASE_URL}/assets/${asset.thumbnail}?width=160`}
-                alt={asset.title}
-                className="w-full h-full object-cover"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-400 uppercase">
-                Empty
-              </div>
-            )}
+            <AssetThumbnail thumbnail={asset.thumbnail} title={asset.title} width={160} />
           </div>
           <div className="min-w-0">
             <span className="bg-zinc-900 text-white text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px]">

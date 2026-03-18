@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Copy, Trash2, Star } from "lucide-react";
+import { Copy, Trash2, Star, X } from "lucide-react";
 import { Asset } from "@/types/schema";
 import { formatDate } from "@/utils/date";
 import { duplicateAssetAction } from "@/app/actions/assets/duplicate";
@@ -44,6 +44,38 @@ function FeatureButton({ assetId, featuredUntil }: { assetId: number; featuredUn
       <Star size={11} />
       {loading ? "..." : "Feature"}
     </button>
+  );
+}
+
+function FeaturedPromo() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    if (!localStorage.getItem("featured_promo_dismissed")) {
+      setVisible(true);
+    }
+  }, []);
+
+  if (!visible) return null;
+
+  const dismiss = () => {
+    localStorage.setItem("featured_promo_dismissed", "1");
+    setVisible(false);
+  };
+
+  return (
+    <div className="border-2 border-emerald-700 bg-emerald-50 p-4 flex gap-4 items-start">
+      <Star size={18} className="text-emerald-700 shrink-0 mt-0.5" fill="currentColor" strokeWidth={0} />
+      <div className="flex-1 min-w-0">
+        <p className="text-body font-black uppercase text-emerald-900">Featured Listings</p>
+        <p className="text-detail text-emerald-800 mt-1 leading-relaxed">
+          Feature a published listing to pin it to the top of the explore feed and show a Featured badge for <span className="font-black">7 days</span>. Great for items you want more eyes on fast.
+        </p>
+      </div>
+      <button onClick={dismiss} className="text-emerald-700 hover:text-emerald-900 transition-colors cursor-pointer shrink-0">
+        <X size={16} />
+      </button>
+    </div>
   );
 }
 
@@ -92,6 +124,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
 
   return (
     <div className="space-y-4">
+      <FeaturedPromo />
       {/* Search */}
       <div className="flex border-2 border-zinc-900 bg-white">
         <input

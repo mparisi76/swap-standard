@@ -16,22 +16,27 @@ export async function middleware(request: NextRequest) {
   const sessionToken = request.cookies.get('directus_session')?.value;
   const refreshToken = request.cookies.get('directus_refresh_token')?.value;
 
-  // Validate the current session token
-  let tokenValid = false;
+  let validToken: string | null = null;
+  let validUserId: string | null = null;
+  let newRefreshToken: string | null = null;
+
+  // Validate current session token
   if (sessionToken) {
     try {
-      const check = await fetch(`${BASE_URL}/users/me`, {
+      const check = await fetch(`${BASE_URL}/users/me?fields=id`, {
         headers: { Authorization: `Bearer ${sessionToken}` },
         cache: 'no-store',
       });
-      tokenValid = check.ok;
-    } catch {
-      tokenValid = false;
-    }
+      if (check.ok) {
+        const { data } = await check.json();
+        validToken = sessionToken;
+        validUserId = data.id;
+      }
+    } catch { /* network error */ }
   }
 
-  // If expired but refresh token exists, attempt refresh
-  if (!tokenValid && refreshToken) {
+  // If expired, attempt refresh
+  if (!validToken && refreshToken) {
     try {
       const refreshRes = await fetch(`${BASE_URL}/auth/refresh`, {
         method: 'POST',
@@ -41,26 +46,44 @@ export async function middleware(request: NextRequest) {
 
       if (refreshRes.ok) {
         const { data } = await refreshRes.json();
-        const response = NextResponse.next();
-        response.cookies.set('directus_session', data.access_token, COOKIE_OPTS);
-        if (data.refresh_token) {
-          response.cookies.set('directus_refresh_token', data.refresh_token, COOKIE_OPTS);
+        validToken = data.access_token;
+        newRefreshToken = data.refresh_token;
+
+        // Get user ID with the new token
+        const userRes = await fetch(`${BASE_URL}/users/me?fields=id`, {
+          headers: { Authorization: `Bearer ${validToken}` },
+          cache: 'no-store',
+        });
+        if (userRes.ok) {
+          const { data: userData } = await userRes.json();
+          validUserId = userData.id;
         }
-        return response;
       }
-    } catch {
-      // Refresh failed — fall through to auth check below
-    }
+    } catch { /* refresh failed */ }
   }
 
-  // No valid session — redirect dashboard routes to login
-  if (pathname.startsWith('/dashboard') && !tokenValid) {
+  // Redirect unauthenticated dashboard requests to login
+  if (pathname.startsWith('/dashboard') && !validToken) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);
   }
 
-  return NextResponse.next();
+  // Forward validated token + userId via request headers so route handlers
+  // don't re-validate (and don't consume the single-use refresh token again)
+  const requestHeaders = new Headers(request.headers);
+  if (validToken) requestHeaders.set('x-auth-token', validToken);
+  if (validUserId) requestHeaders.set('x-auth-user-id', validUserId);
+
+  const response = NextResponse.next({ request: { headers: requestHeaders } });
+
+  // Persist new tokens in cookies if we just refreshed
+  if (newRefreshToken && validToken) {
+    response.cookies.set('directus_session', validToken, COOKIE_OPTS);
+    response.cookies.set('directus_refresh_token', newRefreshToken, COOKIE_OPTS);
+  }
+
+  return response;
 }
 
 export const config = {

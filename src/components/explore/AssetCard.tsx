@@ -1,10 +1,10 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { Star } from "lucide-react";
 import { Asset } from "@/types/schema";
 import { parseTags } from "@/lib/tags";
+import AssetThumbnail from "@/components/assets/AssetThumbnail";
 
 export default function AssetCard({ asset }: { asset: Asset }) {
   const router = useRouter();
@@ -41,17 +41,12 @@ export default function AssetCard({ asset }: { asset: Asset }) {
     >
       {/* Image — full width, fixed aspect ratio */}
       <div className="relative aspect-4/3 w-full bg-zinc-100 border-b-2 border-zinc-900 overflow-hidden">
-        {asset.thumbnail ? (
-          <img
-            src={`${process.env.NEXT_PUBLIC_DIRECTUS_URL}/assets/${asset.thumbnail}?width=600&height=450&fit=cover`}
-            alt={asset.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-        ) : (
-          <div className="w-full h-full flex items-center justify-center font-mono text-label text-zinc-400 uppercase tracking-widest">
-            No Image
-          </div>
-        )}
+        <AssetThumbnail
+          thumbnail={asset.thumbnail}
+          title={asset.title}
+          width={600}
+          imgClassName="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+        />
 
         {/* Type badge — overlaid bottom-left */}
         <span className="absolute bottom-0 left-0 bg-zinc-900 text-white text-label font-black px-2 py-1 uppercase tracking-wider">
