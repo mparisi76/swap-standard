@@ -2,7 +2,7 @@ import { directus } from "@/lib/directus";
 import { readItem } from "@directus/sdk";
 import { Asset } from "@/types/schema";
 import Link from "next/link";
-import { ArrowLeft, Tag, Clock } from "lucide-react";
+import { ArrowLeft, Tag, Clock, Star } from "lucide-react";
 import { notFound } from "next/navigation";
 import { type Metadata } from "next";
 import AssetGallery from "@/components/explore/AssetGallery";
@@ -29,6 +29,7 @@ const FIELDS = [
   "image_gallery.directus_files_id",
   "date_created",
   "user_created",
+  "featured_until",
 ] as unknown as (keyof Asset)[];
 
 async function fetchAsset(id: string): Promise<Asset | null> {
@@ -155,9 +156,17 @@ export default async function AssetDetailPage({
 
           <div className="md:col-span-7 space-y-10">
             <header>
-              <span className="text-label font-black uppercase text-emerald-700 tracking-[0.2em] block mb-2">
-                {asset.asset_status || "Available"}
-              </span>
+              <div className="flex items-center gap-3 mb-2">
+                <span className="text-label font-black uppercase text-emerald-700 tracking-[0.2em]">
+                  {asset.asset_status || "Available"}
+                </span>
+                {asset.featured_until && new Date(asset.featured_until) > new Date() && (
+                  <span className="flex items-center gap-1 text-label font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                    <Star size={9} fill="currentColor" strokeWidth={0} />
+                    Featured
+                  </span>
+                )}
+              </div>
               <h1 className="text-header font-black uppercase italic leading-tight text-zinc-900 border-b-4 border-zinc-900 pb-6">
                 {asset.title}
               </h1>

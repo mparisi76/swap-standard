@@ -8,6 +8,7 @@ import { X } from "lucide-react";
 import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 const RADIUS_OPTIONS = [5, 10, 25, 50, 100];
+const PAGE_SIZE_OPTIONS = [24, 48, 96];
 
 function ActiveTagsBar() {
   const router = useRouter();
@@ -56,6 +57,41 @@ function ActiveTagsBar() {
           Clear all
         </button>
       )}
+    </div>
+  );
+}
+
+function PageSizeSelector() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const current = Number(searchParams.get("limit") || 24);
+
+  const handleChange = (size: number) => {
+    const params = new URLSearchParams(searchParams);
+    params.set("limit", String(size));
+    params.set("page", "1");
+    router.push(`${pathname}?${params.toString()}`);
+  };
+
+  return (
+    <div className="flex items-center gap-2 shrink-0">
+      <span className="hidden lg:block text-label font-black uppercase tracking-widest text-zinc-500">
+        Show:
+      </span>
+      {PAGE_SIZE_OPTIONS.map((size) => (
+        <button
+          key={size}
+          onClick={() => handleChange(size)}
+          className={`text-label font-black uppercase tracking-wider px-3 py-2 border-2 transition-all cursor-pointer
+            ${current === size
+              ? "bg-zinc-900 text-white border-zinc-900"
+              : "bg-white text-zinc-900 border-zinc-900 hover:bg-zinc-100"
+            }`}
+        >
+          {size}
+        </button>
+      ))}
     </div>
   );
 }
@@ -111,6 +147,9 @@ export default function ControlBar() {
         </Suspense>
         <Suspense fallback={null}>
           <RadiusFilter />
+        </Suspense>
+        <Suspense fallback={null}>
+          <PageSizeSelector />
         </Suspense>
       </div>
       <Suspense fallback={null}>

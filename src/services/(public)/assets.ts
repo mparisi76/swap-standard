@@ -1,10 +1,12 @@
 import { directus } from "@/lib/directus";
 import { Asset } from "@/types/schema";
-import { readItems, aggregate } from "@directus/sdk";
+import { readItems } from "@directus/sdk";
 import { cache } from "react";
 import { haversineDistance, boundingBox } from "@/utils/geo";
 import { parseTags } from "@/lib/tags";
 import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
+
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 type DirectusFilter = Record<string, unknown>;
 
@@ -34,15 +36,10 @@ const buildFilters = (params: {
     });
   }
 
-
   if (userLat != null && userLng != null) {
     const box = boundingBox(userLat, userLng, radius);
-    andFilters.push({
-      latitude: { _between: [box.lat_min, box.lat_max] },
-    });
-    andFilters.push({
-      longitude: { _between: [box.lng_min, box.lng_max] },
-    });
+    andFilters.push({ latitude: { _between: [box.lat_min, box.lat_max] } });
+    andFilters.push({ longitude: { _between: [box.lng_min, box.lng_max] } });
   }
 
   return { _and: andFilters };
@@ -59,13 +56,14 @@ export const getAssets = cache(
     userLng?: number;
     radius?: number;
   }) => {
-    const { page = 1, limit = 20, userLat, userLng, tags } = params;
+    const { page = 1, limit = 24, userLat, userLng, tags } = params;
     const filter = buildFilters(params);
 
     const fields = [
       "id", "title", "type", "offering", "seeking", "status",
       "asset_status", "date_created", "thumbnail", "image_gallery",
       "latitude", "longitude", "location_label", "offering_tags", "seeking_tags",
+      "featured_until",
     ];
 
     const hasTags = tags && tags.length > 0;
@@ -91,9 +89,18 @@ export const getAssets = cache(
       );
     }
 
-    const totalCount = hasTags
-      ? assets.length
-      : Number((await directus.request(aggregate("assets", { aggregate: { count: "*" }, query: { filter } })))[0]?.count || 0);
+    let totalCount: number;
+    if (hasTags) {
+      totalCount = assets.length;
+    } else {
+      // Use limit=0&meta=filter_count — no aggregate permission required, just read
+      const countRes = await fetch(
+        `${DIRECTUS_URL}/items/assets?filter=${encodeURIComponent(JSON.stringify(filter))}&limit=0&meta=filter_count`,
+        { cache: "no-store" },
+      );
+      const countJson = await countRes.json();
+      totalCount = countJson?.meta?.filter_count ?? 0;
+    }
 
     // Manual pagination when tag filtering in JS
     if (hasTags) {
@@ -101,7 +108,7 @@ export const getAssets = cache(
       assets = assets.slice(offset, offset + limit);
     }
 
-    // If user location is known, compute distance and sort by proximity
+    // Sort by proximity when user location is active
     if (userLat != null && userLng != null) {
       assets = assets
         .map((a) => ({
@@ -111,10 +118,15 @@ export const getAssets = cache(
               ? haversineDistance(userLat, userLng, a.latitude, a.longitude)
               : undefined,
         }))
-        .sort(
-          (a, b) => (a.distance_miles ?? Infinity) - (b.distance_miles ?? Infinity),
-        );
+        .sort((a, b) => (a.distance_miles ?? Infinity) - (b.distance_miles ?? Infinity));
     }
+
+    // Bubble active featured listings to the top
+    const now = new Date();
+    assets = [
+      ...assets.filter((a) => a.featured_until && new Date(a.featured_until) > now),
+      ...assets.filter((a) => !a.featured_until || new Date(a.featured_until) <= now),
+    ];
 
     return {
       data: assets,

@@ -1,35 +1,41 @@
 import { type Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { directus } from "@/lib/directus";
-import { readItems } from "@directus/sdk";
-import { Asset } from "@/types/schema";
 import AnimatedSection from "@/components/layout/AnimatedSection";
 
+const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+
 export const metadata: Metadata = {
-  title: "SwapStandard — Stronger Together",
+  title: "SwapStandard — Keep Good Things in Use",
   description:
-    "A stewardship registry built on the duty of care. Share what you have, find what you need, and build a network of mutual resilience through direct exchange.",
+    "The things we no longer need still hold immense value for someone else. A space for direct, person-to-person exchange — no middleman, no unnecessary costs.",
   openGraph: {
-    title: "SwapStandard — Stronger Together",
+    title: "SwapStandard — Keep Good Things in Use",
     description:
-      "Share what you have, find what you need. Direct exchange. Mutual resilience.",
+      "No middleman, no unnecessary costs. Direct exchange that keeps good items in use and helps neighbors thrive.",
     url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com",
   },
 };
 
-export const revalidate = 0;
+export const revalidate = 3600;
+
+async function getCount(filter: Record<string, unknown>): Promise<number> {
+  const params = new URLSearchParams({
+    filter: JSON.stringify(filter),
+    limit: "0",
+    meta: "filter_count",
+  });
+  const res = await fetch(`${DIRECTUS_URL}/items/assets?${params}`, { cache: "no-store" });
+  if (!res.ok) return 0;
+  const json = await res.json();
+  return json?.meta?.filter_count ?? 0;
+}
 
 export default async function HomePage() {
-  const assets = await directus.request<Asset[]>(
-    readItems("assets", {
-      filter: { asset_status: { _eq: "available" } },
-      fields: ["id", "title", "offering", "seeking", "type", "asset_status"],
-    }),
-  );
-
-  const sharedCount = assets.filter((a) => a.offering).length;
-  const seekingCount = assets.filter((a) => a.seeking).length;
+  const [sharedCount, seekingCount] = await Promise.all([
+    getCount({ _and: [{ status: { _eq: "published" } }, { offering: { _nnull: true } }] }),
+    getCount({ _and: [{ status: { _eq: "published" } }, { seeking: { _nnull: true } }] }),
+  ]);
 
   return (
     <main className="min-h-[calc(100vh-80px)] bg-[#F9F8F6] py-20 px-6 font-serif">
@@ -37,13 +43,18 @@ export default async function HomePage() {
         <AnimatedSection delay={0.1}>
           <section className="mb-16">
             <h1 className="text-[calc(var(--text-header-size)*2.5)] md:text-[calc(var(--text-header-size)*3)] font-bold text-zinc-900 leading-tight mb-6">
-              Stronger Together.
+              Keep Good Things in Use.
             </h1>
-            <p className="text-[calc(var(--text-body-size)*1.25)] text-zinc-600 leading-relaxed max-w-2xl italic">
-              SwapStandard is a stewardship registry built on the duty of care.
-              We believe in direct exchange as a way to look out for our fellow
-              humans. Find what you need, share what you can, and build a
-              network of mutual resilience.
+            <p className="text-[calc(var(--text-body-size)*1.25)] text-zinc-600 leading-relaxed max-w-2xl italic mb-6">
+              The things we no longer need still hold immense value for someone
+              else. SwapStandard is built on a simple, human duty of care: by
+              sharing our resources — through exchange or gift — we strengthen
+              the fabric of our local community.
+            </p>
+            <p className="text-[calc(var(--text-body-size)*1.1)] text-zinc-500 leading-relaxed max-w-2xl">
+              No middleman, no unnecessary costs. Just a straightforward way to
+              keep good items in use, support a neighbor, and move away from a
+              culture of waste toward one of connection.
             </p>
           </section>
         </AnimatedSection>
@@ -87,10 +98,11 @@ export default async function HomePage() {
               className="border-4 border-zinc-900 p-8 hover:bg-zinc-100 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
               <span className="block text-header font-bold text-zinc-900 mb-2">
-                Share a Resource
+                Offer Something
               </span>
               <span className="text-zinc-600 italic text-detail">
-                Register tools, skills, or surplus to support your community.
+                Clear out your workspace. List a tool, a skill, or anything
+                with life left in it.
               </span>
             </Link>
             <Link
@@ -98,10 +110,11 @@ export default async function HomePage() {
               className="border-4 border-zinc-900 p-8 hover:bg-zinc-100 transition-all hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]"
             >
               <span className="block text-header font-bold text-zinc-900 mb-2">
-                Identify a Need
+                Find What You Need
               </span>
               <span className="text-zinc-600 italic text-detail">
-                Browse what others require and offer your support.
+                Browse your local exchange. Everything here is offered
+                person-to-person, directly.
               </span>
             </Link>
           </section>
@@ -127,8 +140,7 @@ export default async function HomePage() {
             </div>
             <div className="md:ml-auto">
               <p className="text-detail italic text-zinc-500 max-w-50">
-                &ldquo;The duty of care is the foundation of our local
-                strength.&rdquo;
+                &ldquo;Every swap is an opportunity to support a neighbor.&rdquo;
               </p>
             </div>
           </section>

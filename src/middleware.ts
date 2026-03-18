@@ -6,7 +6,7 @@ const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const COOKIE_OPTS = {
   httpOnly: true,
   secure: process.env.NODE_ENV === 'production',
-  sameSite: 'strict' as const,
+  sameSite: 'lax' as const,
   path: '/',
   maxAge: 60 * 60 * 24 * 7,
 };
@@ -54,8 +54,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // No valid session — redirect dashboard routes to login
-  const hasSession = tokenValid || (!tokenValid && !!refreshToken);
-  if (pathname.startsWith('/dashboard') && !hasSession) {
+  if (pathname.startsWith('/dashboard') && !tokenValid) {
     const loginUrl = new URL('/login', request.url);
     loginUrl.searchParams.set('callbackUrl', pathname);
     return NextResponse.redirect(loginUrl);

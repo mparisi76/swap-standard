@@ -2,6 +2,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
+import { Star } from "lucide-react";
 import { Asset } from "@/types/schema";
 import { parseTags } from "@/lib/tags";
 
@@ -25,10 +26,11 @@ export default function AssetCard({ asset }: { asset: Asset }) {
     return `/explore?${params.toString()}`;
   };
 
-  const isOffering = Boolean(asset.offering);
-  const isSeeking  = Boolean(asset.seeking);
-  const isSwap     = isOffering && isSeeking;
-  const isActive   = asset.asset_status === "available";
+  const isOffering  = Boolean(asset.offering);
+  const isSeeking   = Boolean(asset.seeking);
+  const isSwap      = isOffering && isSeeking;
+  const isActive    = asset.asset_status === "available";
+  const isFeatured  = Boolean(asset.featured_until && new Date(asset.featured_until) > new Date());
 
   return (
     <div
@@ -55,6 +57,14 @@ export default function AssetCard({ asset }: { asset: Asset }) {
         <span className="absolute bottom-0 left-0 bg-zinc-900 text-white text-label font-black px-2 py-1 uppercase tracking-wider">
           {asset.type || "General"}
         </span>
+
+        {/* Featured badge — overlaid top-right */}
+        {isFeatured && (
+          <span className="absolute top-0 right-0 bg-emerald-700 text-white text-label font-black px-2 py-1 flex items-center gap-1">
+            <Star size={9} fill="currentColor" strokeWidth={0} />
+            Featured
+          </span>
+        )}
 
         {/* Distance — overlaid bottom-right */}
         {asset.distance_miles != null && (

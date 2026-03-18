@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { getValidTokenWithUser } from "@/lib/auth";
 import { Asset, Exchange, ExchangeStatus } from "@/types/schema";
 import { Plus, FileText, Globe, ArrowLeftRight } from "lucide-react";
+import { formatDate } from "@/utils/date";
 import ListingsTable from "@/components/dashboard/ListingsTable";
 
 export const metadata: Metadata = {
@@ -30,7 +31,7 @@ const EXCHANGE_STATUS_LABEL: Record<ExchangeStatus, string> = {
 
 async function getMyAssets(token: string): Promise<Asset[]> {
   const url = new URL(`${BASE_URL}/items/assets`);
-  url.searchParams.set("fields", "id,title,type,status,asset_status,date_created");
+  url.searchParams.set("fields", "id,title,type,status,asset_status,date_created,featured_until");
   url.searchParams.set("filter[user_created][_eq]", "$CURRENT_USER");
   url.searchParams.set("sort", "-date_created");
   url.searchParams.set("limit", "50");
@@ -167,7 +168,7 @@ export default async function DashboardPage() {
 
                     {/* Date — desktop only */}
                     <span className="font-mono text-label text-zinc-500 shrink-0 hidden md:block">
-                      {new Date(ex.date_updated).toLocaleDateString()}
+                      {formatDate(ex.date_updated)}
                     </span>
 
                     <span className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 shrink-0">

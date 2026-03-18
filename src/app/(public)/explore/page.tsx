@@ -37,8 +37,10 @@ interface ExploreParams {
   radius?: string;
 }
 
+const PAGE_SIZE_OPTIONS = [24, 48, 96];
+
 async function ResourceFeed({ params }: { params: ExploreParams }) {
-  const itemsPerPage = 24;
+  const itemsPerPage = PAGE_SIZE_OPTIONS.includes(Number(params.limit)) ? Number(params.limit) : 24;
   const currentPage = Number(params.page) || 1;
   const searchTerm = params.search || "";
   const userLat = params.lat ? parseFloat(params.lat) : undefined;

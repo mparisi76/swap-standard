@@ -2,12 +2,50 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Copy, Trash2 } from "lucide-react";
+import { Copy, Trash2, Star } from "lucide-react";
 import { Asset } from "@/types/schema";
+import { formatDate } from "@/utils/date";
 import { duplicateAssetAction } from "@/app/actions/assets/duplicate";
 import { deleteAssetAction } from "@/app/actions/assets/delete";
 import AssetStatusSelect from "./AssetStatusSelect";
 import PublishStatusSelect from "./PublishStatusSelect";
+
+function FeatureButton({ assetId, featuredUntil }: { assetId: number; featuredUntil?: string | null }) {
+  const [loading, setLoading] = useState(false);
+  const isActive = featuredUntil && new Date(featuredUntil) > new Date();
+
+  if (isActive) {
+    return (
+      <span className="text-label font-bold uppercase tracking-wider text-emerald-700 flex items-center gap-1 shrink-0">
+        <Star size={11} fill="currentColor" />
+        Featured until {formatDate(featuredUntil!)}
+      </span>
+    );
+  }
+
+  const handleClick = async () => {
+    setLoading(true);
+    const res = await fetch("/api/checkout/featured", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ assetId }),
+    });
+    const { url } = await res.json();
+    if (url) window.location.href = url;
+    else setLoading(false);
+  };
+
+  return (
+    <button
+      onClick={handleClick}
+      disabled={loading}
+      className="text-label font-black uppercase tracking-wider text-zinc-500 hover:text-emerald-700 transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1 shrink-0"
+    >
+      <Star size={11} />
+      {loading ? "..." : "Feature"}
+    </button>
+  );
+}
 
 const TYPE_FILTERS = ["all", "goods", "skills", "services"] as const;
 const STATUS_FILTERS = ["all", "published", "draft", "archived"] as const;
@@ -155,7 +193,7 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                   <AssetStatusSelect assetId={item.id} current={item.asset_status} />
                 </div>
                 <span className="font-mono text-label text-zinc-500 shrink-0 hidden md:block">
-                  {new Date(item.date_created).toLocaleDateString()}
+                  {formatDate(item.date_created)}
                 </span>
               </div>
 
@@ -168,6 +206,9 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
                   <Link href={`/explore/${item.id}`} className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 transition-colors">
                     View →
                   </Link>
+                )}
+                {item.status === "published" && (
+                  <FeatureButton assetId={item.id} featuredUntil={item.featured_until} />
                 )}
                 <form action={duplicateAssetAction}>
                   <input type="hidden" name="assetId" value={item.id} />

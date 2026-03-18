@@ -24,6 +24,7 @@ export interface Asset {
   location_label?: string | null;
   offering_tags?: string | null;
   seeking_tags?: string | null;
+  featured_until?: string | null;
   // Computed field — not stored in Directus, populated by the assets service
   distance_miles?: number;
 }
