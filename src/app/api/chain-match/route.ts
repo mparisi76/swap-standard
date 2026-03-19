@@ -94,7 +94,6 @@ export async function POST(req: NextRequest) {
   );
 
   console.log(`[chain-match] existing trades fetch status: ${existingRes.status}`);
-  const MAX_TOTAL_CHAIN_TRADES = 1000;
   const existingKeys = new Set<string>();
   if (existingRes.ok) {
     const { data: existing }: { data: { asset_a: number; asset_b: number; asset_c: number }[] } =
@@ -102,11 +101,6 @@ export async function POST(req: NextRequest) {
     for (const row of existing) {
       existingKeys.add(cycleKey(row.asset_a, row.asset_b, row.asset_c));
     }
-  }
-
-  // Bail out if we already have enough chain trades
-  if (existingKeys.size >= MAX_TOTAL_CHAIN_TRADES) {
-    return NextResponse.json({ message: "Chain trade cap reached, skipping", total: existingKeys.size });
   }
 
   // 3. Find 3-cycles: A→B→C→A
