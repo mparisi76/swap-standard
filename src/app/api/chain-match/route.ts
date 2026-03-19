@@ -73,9 +73,9 @@ export async function POST(req: NextRequest) {
   // Filter to assets that have both tag types populated, excluding seed users
   const eligible = assets
     .filter((a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created)
-    .map((a) => ({
+    .map((a): Omit<AssetRow, "user_created"> & { user_created: string; _email: string } => ({
       ...a,
-      user_created: typeof a.user_created === "object" ? a.user_created.id : a.user_created,
+      user_created: typeof a.user_created === "object" ? a.user_created.id : (a.user_created as string),
       _email: typeof a.user_created === "object" ? a.user_created.email : "",
     }))
     .filter((a) => !a._email.endsWith("@seed.swapstandard.com"));

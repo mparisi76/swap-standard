@@ -48,10 +48,10 @@ export async function POST(req: NextRequest) {
   if (!assetsRes.ok) return NextResponse.json({ error: "Failed to fetch assets" }, { status: 500 });
 
   const { data: assets }: { data: AssetRow[] } = await assetsRes.json();
-  const normalize = (a: AssetRow) => ({
+  const normalize = (a: AssetRow): Omit<AssetRow, "user_created"> & { user_created: string; _email: string } => ({
     ...a,
-    user_created: typeof a.user_created === "object" ? a.user_created.id : a.user_created,
-    _email: typeof a.user_created === "object" ? (a.user_created as { id: string; email: string }).email : "",
+    user_created: typeof a.user_created === "object" ? a.user_created.id : (a.user_created as string),
+    _email: typeof a.user_created === "object" ? a.user_created.email : "",
   });
 
   const allReal = assets
