@@ -4,4 +4,5 @@
  */
 export const features = {
   chainTrades: process.env.CHAIN_TRADES_ENABLED === "true",
+  directMatches: process.env.DIRECT_MATCHES_ENABLED === "true",
 } as const;

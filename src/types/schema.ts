@@ -54,6 +54,27 @@ export interface ChainTrade {
   date_updated: string;
 }
 
+export type DirectMatchStatus = 'suggested' | 'accepted_both' | 'declined';
+
+export interface DirectMatchAsset {
+  id: number;
+  title: string;
+  location_label: string | null;
+  user_created: { id: string; first_name: string | null; last_name: string | null };
+}
+
+export interface DirectMatch {
+  id: number;
+  match_status: DirectMatchStatus;
+  asset_a: number | DirectMatchAsset;
+  asset_b: number | DirectMatchAsset;
+  user_a: string;
+  user_b: string;
+  accepted_a: boolean;
+  accepted_b: boolean;
+  date_created: string;
+}
+
 export interface SwapSchema {
   assets: Asset[];
   exchanges: Exchange[];

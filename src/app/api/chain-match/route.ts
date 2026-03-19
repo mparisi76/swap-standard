@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseTags } from "@/lib/tags";
 import { haversineDistance } from "@/utils/geo";
+import { sendChainTradeDigest } from "@/lib/email";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
@@ -10,7 +11,8 @@ const MAX_DISTANCE_MILES = 50;
 
 interface AssetRow {
   id: number;
-  user_created: string;
+  user_created: string | { id: string; email: string };
+  title: string;
   offering_tags: string | null;
   seeking_tags: string | null;
   latitude: number | null;
@@ -51,7 +53,7 @@ export async function POST(req: NextRequest) {
   // 1. Fetch all published assets with tag data
   const assetsUrl = new URL(`${BASE_URL}/items/assets`);
   assetsUrl.searchParams.set("filter[status][_eq]", "published");
-  assetsUrl.searchParams.set("fields", "id,user_created,offering_tags,seeking_tags,latitude,longitude");
+  assetsUrl.searchParams.set("fields", "id,user_created,title,offering_tags,seeking_tags,latitude,longitude,user_created.email");
   assetsUrl.searchParams.set("limit", "-1");
 
   console.log("[chain-match] fetching assets...");
@@ -68,10 +70,15 @@ export async function POST(req: NextRequest) {
   const { data: assets }: { data: AssetRow[] } = await assetsRes.json();
   console.log(`[chain-match] fetched ${assets.length} assets`);
 
-  // Filter to assets that have both tag types populated
-  const eligible = assets.filter(
-    (a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created,
-  );
+  // Filter to assets that have both tag types populated, excluding seed users
+  const eligible = assets
+    .filter((a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created)
+    .map((a) => ({
+      ...a,
+      user_created: typeof a.user_created === "object" ? a.user_created.id : a.user_created,
+      _email: typeof a.user_created === "object" ? a.user_created.email : "",
+    }))
+    .filter((a) => !a._email.endsWith("@seed.swapstandard.com"));
   console.log(`[chain-match] ${eligible.length} eligible assets`);
 
   if (debug) {
@@ -118,7 +125,7 @@ export async function POST(req: NextRequest) {
   }
 
   const MAX_NEW_CYCLES = 1000;
-  const newCycles: { asset_a: number; asset_b: number; asset_c: number; user_a: string; user_b: string; user_c: string }[] = [];
+  const newCycles: { asset_a: number; asset_b: number; asset_c: number; user_a: string; user_b: string; user_c: string; title_a: string; title_b: string; title_c: string }[] = [];
   const seenKeys = new Set<string>(existingKeys);
 
   for (const a of eligible) {
@@ -168,6 +175,9 @@ export async function POST(req: NextRequest) {
           user_a: a.user_created,
           user_b: b.user_created,
           user_c: c.user_created,
+          title_a: a.title,
+          title_b: b.title,
+          title_c: c.title,
         });
 
         if (newCycles.length >= MAX_NEW_CYCLES) break;
@@ -191,6 +201,47 @@ export async function POST(req: NextRequest) {
     });
     if (res.ok) written = newCycles.length;
     else console.error("Failed to write chain_trades:", await res.text());
+  }
+
+  // 5. Send digest emails grouped by user
+  if (written > 0) {
+    const userIds = [...new Set(newCycles.flatMap((c) => [c.user_a, c.user_b, c.user_c]))];
+
+    const usersRes = await fetch(
+      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name`,
+      { headers: { Authorization: `Bearer ${STATIC_TOKEN}` } },
+    );
+
+    const userMap = new Map<string, { email: string; first_name: string | null }>();
+    if (usersRes.ok) {
+      const { data: users } = await usersRes.json();
+      for (const u of users) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+    }
+
+    // Group cycles by user, pick their first involved asset for the email
+    const userCycles = new Map<string, { assetTitle: string; assetId: number; count: number }>();
+    for (const cycle of newCycles) {
+      const entries: [string, string, number][] = [
+        [cycle.user_a, cycle.title_a, cycle.asset_a],
+        [cycle.user_b, cycle.title_b, cycle.asset_b],
+        [cycle.user_c, cycle.title_c, cycle.asset_c],
+      ];
+      for (const [userId, title, assetId] of entries) {
+        if (!userCycles.has(userId)) {
+          userCycles.set(userId, { assetTitle: title, assetId, count: 0 });
+        }
+        userCycles.get(userId)!.count++;
+      }
+    }
+
+    const emailPromises = [...userCycles.entries()].map(([userId, { assetTitle, assetId, count }]) => {
+      const user = userMap.get(userId);
+      if (!user?.email) return Promise.resolve();
+      return sendChainTradeDigest({ to: user.email, firstName: user.first_name, assetTitle, assetId, chainCount: count });
+    });
+
+    await Promise.allSettled(emailPromises);
+    console.log(`[chain-match] sent emails to ${userCycles.size} users`);
   }
 
   return NextResponse.json({

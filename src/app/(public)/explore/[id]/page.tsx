@@ -11,6 +11,7 @@ import RecentlyViewed from "@/components/explore/RecentlyViewed";
 import SimilarItems from "@/components/explore/SimilarItems";
 import MoreFromMember from "@/components/explore/MoreFromMember";
 import ChainTradesSection from "@/components/explore/ChainTradesSection";
+import DirectMatchSection from "@/components/explore/DirectMatchSection";
 import { Suspense } from "react";
 
 import { getValidTokenWithUser } from "@/lib/auth";
@@ -139,6 +140,7 @@ export default async function AssetDetailPage({
 
       <div className="max-w-5xl mx-auto px-6 pt-8">
         <Suspense fallback={null}>
+          <DirectMatchSection assetId={asset.id} currentUserId={auth?.userId ?? null} />
           <ChainTradesSection assetId={asset.id} currentUserId={auth?.userId ?? null} />
         </Suspense>
       </div>
