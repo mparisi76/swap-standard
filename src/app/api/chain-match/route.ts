@@ -213,14 +213,16 @@ export async function POST(req: NextRequest) {
     const userIds = [...new Set(newCycles.flatMap((c) => [c.user_a, c.user_b, c.user_c]))];
 
     const usersRes = await fetch(
-      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name`,
+      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name,email_unsubscribed`,
       { headers: { Authorization: `Bearer ${STATIC_TOKEN}` } },
     );
 
     const userMap = new Map<string, { email: string; first_name: string | null }>();
     if (usersRes.ok) {
       const { data: users } = await usersRes.json();
-      for (const u of users) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+      for (const u of users) {
+        if (!u.email_unsubscribed) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+      }
     }
 
     // Group cycles by user, pick their first involved asset for the email
@@ -242,7 +244,7 @@ export async function POST(req: NextRequest) {
     const emailPromises = [...userCycles.entries()].map(([userId, { assetTitle, assetId, count }]) => {
       const user = userMap.get(userId);
       if (!user?.email) return Promise.resolve();
-      return sendChainTradeDigest({ to: user.email, firstName: user.first_name, assetTitle, assetId, chainCount: count });
+      return sendChainTradeDigest({ to: user.email, userId, firstName: user.first_name, assetTitle, assetId, chainCount: count });
     });
 
     await Promise.allSettled(emailPromises);

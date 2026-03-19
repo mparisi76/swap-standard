@@ -1,10 +1,11 @@
 import { Resend } from "resend";
+import { unsubscribeUrl } from "@/lib/unsubscribe";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 const FROM = "SwapStandard <noreply@swapstandard.com>";
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.swapstandard.com";
 
-function baseTemplate(title: string, body: string): string {
+function baseTemplate(title: string, body: string, unsubUrl?: string): string {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"></head>
 <body style="margin:0;padding:0;background:#F9F8F6;font-family:monospace">
@@ -23,6 +24,7 @@ function baseTemplate(title: string, body: string): string {
         <tr>
           <td style="border-top:2px solid #e4e4e7;padding:16px 32px">
             <p style="margin:0;font-size:10px;color:#a1a1aa;text-transform:uppercase;letter-spacing:0.15em">SwapStandard — Local Barter Exchange</p>
+            ${unsubUrl ? `<p style="margin:6px 0 0"><a href="${unsubUrl}" style="font-size:10px;color:#a1a1aa;text-decoration:underline">Unsubscribe from email notifications</a></p>` : ""}
           </td>
         </tr>
       </table>
@@ -57,11 +59,12 @@ function matchRow(yourTitle: string, theirTitle: string, assetId: number): strin
 
 export interface DirectMatchEmailData {
   to: string;
+  userId: string;
   firstName: string | null;
   matches: { yourAssetTitle: string; theirAssetTitle: string; assetId: number }[];
 }
 
-export async function sendDirectMatchDigest({ to, firstName, matches }: DirectMatchEmailData) {
+export async function sendDirectMatchDigest({ to, userId, firstName, matches }: DirectMatchEmailData) {
   const name = firstName ?? "Member";
   const count = matches.length;
 
@@ -81,19 +84,43 @@ export async function sendDirectMatchDigest({ to, firstName, matches }: DirectMa
     from: FROM,
     to,
     subject: `${count} new trade match${count > 1 ? "es" : ""} on SwapStandard`,
-    html: baseTemplate(`${count} Trade Match${count > 1 ? "es" : ""} Found`, body),
+    html: baseTemplate(`${count} Trade Match${count > 1 ? "es" : ""} Found`, body, unsubscribeUrl(userId)),
+  });
+}
+
+export async function sendOffererMatchDigest({ to, userId, firstName, matches }: DirectMatchEmailData) {
+  const name = firstName ?? "Member";
+  const count = matches.length;
+
+  const rows = matches.slice(0, 5).map((m) => matchRow(m.theirAssetTitle, m.yourAssetTitle, m.assetId)).join("");
+  const more = count > 5 ? `<p style="margin:12px 0 0;font-size:11px;color:#71717a">+ ${count - 5} more in your dashboard.</p>` : "";
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      ${count > 1 ? `${count} members nearby are` : "A member nearby is"} looking for what you're offering.
+    </p>
+    ${rows}
+    ${more}`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${count > 1 ? `${count} members want` : "Someone wants"} what you're offering`,
+    html: baseTemplate(`${count} Member${count > 1 ? "s" : ""} Looking for Your Listing`, body, unsubscribeUrl(userId)),
   });
 }
 
 export interface ChainTradeEmailData {
   to: string;
+  userId: string;
   firstName: string | null;
   assetTitle: string;
   assetId: number;
   chainCount: number;
 }
 
-export async function sendChainTradeDigest({ to, firstName, chainCount, assetTitle, assetId }: ChainTradeEmailData) {
+export async function sendChainTradeDigest({ to, userId, firstName, chainCount, assetTitle, assetId }: ChainTradeEmailData) {
   const name = firstName ?? "Member";
 
   const body = `
@@ -117,6 +144,6 @@ export async function sendChainTradeDigest({ to, firstName, chainCount, assetTit
     from: FROM,
     to,
     subject: `Chain trade opportunity — ${assetTitle}`,
-    html: baseTemplate("Chain Trade Found", body),
+    html: baseTemplate("Chain Trade Found", body, unsubscribeUrl(userId)),
   });
 }

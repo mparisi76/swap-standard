@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { parseTags } from "@/lib/tags";
 import { haversineDistance } from "@/utils/geo";
-import { sendDirectMatchDigest } from "@/lib/email";
+import { sendDirectMatchDigest, sendOffererMatchDigest } from "@/lib/email";
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
@@ -156,31 +156,46 @@ export async function POST(req: NextRequest) {
     const userIds = [...new Set(newMatches.flatMap((m) => [m.user_a, m.user_b]))];
 
     const usersRes = await fetch(
-      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name`,
+      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name,email_unsubscribed`,
       { headers: { Authorization: `Bearer ${STATIC_TOKEN}` } },
     );
 
     const userMap = new Map<string, { email: string; first_name: string | null }>();
     if (usersRes.ok) {
       const { data: users } = await usersRes.json();
-      for (const u of users) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+      for (const u of users) {
+        if (!u.email_unsubscribed) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+      }
     }
 
-    // Group matches by seeker (user_a) only — they're the one being notified
-    const userMatches = new Map<string, { yourAssetTitle: string; theirAssetTitle: string; assetId: number }[]>();
+    // Group by seeker (user_a): "someone offers what you want"
+    const seekerMatches = new Map<string, { yourAssetTitle: string; theirAssetTitle: string; assetId: number }[]>();
+    // Group by offerer (user_b): "someone wants what you're offering"
+    const offererMatches = new Map<string, { yourAssetTitle: string; theirAssetTitle: string; assetId: number }[]>();
+
     for (const m of newMatches) {
-      if (!userMatches.has(m.user_a)) userMatches.set(m.user_a, []);
-      userMatches.get(m.user_a)!.push({ yourAssetTitle: m.title_a, theirAssetTitle: m.title_b, assetId: m.asset_a });
+      if (!seekerMatches.has(m.user_a)) seekerMatches.set(m.user_a, []);
+      seekerMatches.get(m.user_a)!.push({ yourAssetTitle: m.title_a, theirAssetTitle: m.title_b, assetId: m.asset_a });
+
+      if (!offererMatches.has(m.user_b)) offererMatches.set(m.user_b, []);
+      offererMatches.get(m.user_b)!.push({ yourAssetTitle: m.title_b, theirAssetTitle: m.title_a, assetId: m.asset_b });
     }
 
-    const emailPromises = [...userMatches.entries()].map(([userId, matches]) => {
-      const user = userMap.get(userId);
-      if (!user?.email) return Promise.resolve();
-      return sendDirectMatchDigest({ to: user.email, firstName: user.first_name, matches });
-    });
+    const emailPromises = [
+      ...[...seekerMatches.entries()].map(([userId, matches]) => {
+        const user = userMap.get(userId);
+        if (!user?.email) return Promise.resolve();
+        return sendDirectMatchDigest({ to: user.email, userId, firstName: user.first_name, matches });
+      }),
+      ...[...offererMatches.entries()].map(([userId, matches]) => {
+        const user = userMap.get(userId);
+        if (!user?.email) return Promise.resolve();
+        return sendOffererMatchDigest({ to: user.email, userId, firstName: user.first_name, matches });
+      }),
+    ];
 
     await Promise.allSettled(emailPromises);
-    console.log(`[direct-match] sent emails to ${userMatches.size} users`);
+    console.log(`[direct-match] sent emails to ${seekerMatches.size} seekers, ${offererMatches.size} offerers`);
   }
 
   return NextResponse.json({ seekers: seekers.length, offerers: offerers.length, new_matches_found: newMatches.length, written });
