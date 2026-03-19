@@ -9,7 +9,7 @@ const CHAIN_MATCH_SECRET = process.env.CHAIN_MATCH_SECRET!;
 const CHAIN_TRADES_ENABLED = process.env.CHAIN_TRADES_ENABLED === "true";
 const MAX_DISTANCE_MILES = 50;
 
-interface AssetRow {
+interface RawAssetRow {
   id: number;
   user_created: string | { id: string; email: string };
   title: string;
@@ -17,6 +17,11 @@ interface AssetRow {
   seeking_tags: string | null;
   latitude: number | null;
   longitude: number | null;
+}
+
+interface AssetRow extends Omit<RawAssetRow, "user_created"> {
+  user_created: string;
+  _email: string;
 }
 
 function withinDistance(a: AssetRow, b: AssetRow): boolean {
@@ -67,13 +72,13 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Failed to fetch assets", status: assetsRes.status, body }, { status: 500 });
   }
 
-  const { data: assets }: { data: AssetRow[] } = await assetsRes.json();
+  const { data: assets }: { data: RawAssetRow[] } = await assetsRes.json();
   console.log(`[chain-match] fetched ${assets.length} assets`);
 
   // Filter to assets that have both tag types populated, excluding seed users
   const eligible = assets
     .filter((a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created)
-    .map((a): Omit<AssetRow, "user_created"> & { user_created: string; _email: string } => ({
+    .map((a): AssetRow => ({
       ...a,
       user_created: typeof a.user_created === "object" ? a.user_created.id : (a.user_created as string),
       _email: typeof a.user_created === "object" ? a.user_created.email : "",

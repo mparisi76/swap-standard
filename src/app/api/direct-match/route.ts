@@ -9,7 +9,7 @@ const DIRECT_MATCH_SECRET = process.env.DIRECT_MATCH_SECRET!;
 const MAX_DISTANCE_MILES = 50;
 const MAX_NEW_MATCHES = 1000;
 
-interface AssetRow {
+interface RawAssetRow {
   id: number;
   user_created: string | { id: string; email: string };
   title: string;
@@ -17,6 +17,11 @@ interface AssetRow {
   seeking_tags: string | null;
   latitude: number | null;
   longitude: number | null;
+}
+
+interface AssetRow extends Omit<RawAssetRow, "user_created"> {
+  user_created: string;
+  _email: string;
 }
 
 function withinDistance(a: AssetRow, b: AssetRow): boolean {
@@ -47,8 +52,8 @@ export async function POST(req: NextRequest) {
   });
   if (!assetsRes.ok) return NextResponse.json({ error: "Failed to fetch assets" }, { status: 500 });
 
-  const { data: assets }: { data: AssetRow[] } = await assetsRes.json();
-  const normalize = (a: AssetRow): Omit<AssetRow, "user_created"> & { user_created: string; _email: string } => ({
+  const { data: assets }: { data: RawAssetRow[] } = await assetsRes.json();
+  const normalize = (a: RawAssetRow): AssetRow => ({
     ...a,
     user_created: typeof a.user_created === "object" ? a.user_created.id : (a.user_created as string),
     _email: typeof a.user_created === "object" ? a.user_created.email : "",
