@@ -6,8 +6,6 @@ const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 const DIRECTUS_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 const WEBHOOK_SECRET = process.env.STRIPE_WEBHOOK_SECRET!;
 
-// Required: consume raw body for Stripe signature verification
-export const config = { api: { bodyParser: false } };
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
