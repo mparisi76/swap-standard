@@ -2,16 +2,18 @@ import { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getValidTokenWithUser } from "@/lib/auth";
-import { Asset, Exchange, ExchangeStatus } from "@/types/schema";
-import { Plus, FileText, Globe, ArrowLeftRight } from "lucide-react";
+import { Asset, Exchange, ExchangeStatus, DirectMatch, DirectMatchAsset } from "@/types/schema";
+import { Plus, FileText, Globe, ArrowLeftRight, Zap } from "lucide-react";
 import { formatDate } from "@/utils/date";
 import ListingsTable from "@/components/dashboard/ListingsTable";
+import { features } from "@/lib/features";
 
 export const metadata: Metadata = {
   title: "Dashboard | SwapStandard",
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 
 
 
@@ -66,6 +68,30 @@ async function getMyExchanges(token: string): Promise<Exchange[]> {
   return (json.data as Exchange[]) ?? [];
 }
 
+async function getMyMatches(userId: string): Promise<DirectMatch[]> {
+  if (!features.directMatches) return [];
+  const fields = [
+    "id", "match_status", "user_a", "user_b",
+    "asset_a.id", "asset_a.title",
+    "asset_b.id", "asset_b.title",
+  ].join(",");
+  const url = new URL(`${BASE_URL}/items/direct_matches`);
+  url.searchParams.set("fields", fields);
+  url.searchParams.set("filter[match_status][_eq]", "suggested");
+  url.searchParams.set("filter[_or][0][user_a][_eq]", userId);
+  url.searchParams.set("filter[_or][1][user_b][_eq]", userId);
+  url.searchParams.set("sort", "-date_created");
+  url.searchParams.set("limit", "10");
+
+  const res = await fetch(url.toString(), {
+    headers: { Authorization: `Bearer ${STATIC_TOKEN}` },
+    cache: "no-store",
+  });
+  if (!res.ok) return [];
+  const json = await res.json();
+  return (json.data as DirectMatch[]) ?? [];
+}
+
 function memberName(user: { first_name: string | null; last_name: string | null }): string {
   return `${user.first_name ?? ""} ${user.last_name ?? ""}`.trim() || "Anonymous";
 }
@@ -75,9 +101,10 @@ export default async function DashboardPage() {
   if (!auth) redirect("/login");
   const { token, userId } = auth;
 
-  const [items, exchanges] = await Promise.all([
+  const [items, exchanges, matches] = await Promise.all([
     getMyAssets(token),
     getMyExchanges(token),
+    getMyMatches(userId),
   ]);
 
   const published = items.filter((i) => i.status === "published").length;
@@ -133,6 +160,16 @@ export default async function DashboardPage() {
               {activeExchanges}
             </p>
           </div>
+
+          {features.directMatches && (
+            <div className="border-4 border-emerald-600 p-6 md:p-8 bg-white">
+              <Zap size={20} className="mb-3 text-emerald-600" />
+              <h2 className="text-body font-black uppercase text-zinc-900">Matches</h2>
+              <p className="text-[calc(var(--text-header-size)*2)] font-black text-emerald-600 leading-none mt-1">
+                {matches.length}
+              </p>
+            </div>
+          )}
         </div>
 
         {/* Active Trades */}
@@ -173,6 +210,48 @@ export default async function DashboardPage() {
 
                     <span className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 shrink-0">
                       Open →
+                    </span>
+                  </Link>
+                );
+              })}
+            </div>
+          </section>
+        )}
+
+        {/* Matches */}
+        {features.directMatches && matches.length > 0 && (
+          <section className="space-y-4">
+            <h2 className="text-label font-black uppercase tracking-widest text-zinc-500 border-b-2 border-zinc-900 pb-4">
+              Trade Matches
+            </h2>
+            <div className="border-2 border-zinc-900 bg-white divide-y-2 divide-zinc-100">
+              {matches.map((match) => {
+                const a = match.asset_a as DirectMatchAsset;
+                const b = match.asset_b as DirectMatchAsset;
+                const isSeeker = match.user_a === userId;
+                const yourAsset = isSeeker ? a : b;
+                const theirAsset = isSeeker ? b : a;
+                return (
+                  <Link
+                    key={match.id}
+                    href={`/explore/${theirAsset?.id}`}
+                    className="flex items-center gap-4 px-4 md:px-6 py-4 hover:bg-zinc-50 transition-colors"
+                  >
+                    <div className="flex-1 min-w-0">
+                      <p className="text-body font-black uppercase text-zinc-900 truncate">
+                        {theirAsset?.title ?? "—"}
+                      </p>
+                      <p className="text-label font-bold uppercase text-zinc-500 truncate">
+                        {isSeeker ? "Offers what you're seeking on" : "Looking for what you offer on"}{" "}
+                        <span className="text-zinc-700">{yourAsset?.title}</span>
+                      </p>
+                    </div>
+                    <span className="text-label font-black uppercase tracking-widest text-emerald-600 shrink-0 flex items-center gap-1">
+                      <Zap size={11} fill="currentColor" strokeWidth={0} />
+                      Match
+                    </span>
+                    <span className="text-label font-black uppercase tracking-widest text-zinc-500 hover:text-zinc-900 shrink-0">
+                      View →
                     </span>
                   </Link>
                 );
