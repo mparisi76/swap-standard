@@ -3,6 +3,7 @@
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { isBot } from "@/utils/honeypot";
+import { moderateContent } from "@/utils/moderation";
 
 export type AssetFormState = {
   error?: string;
@@ -36,6 +37,9 @@ export async function createAssetAction(
   if (!zip) fieldErrors.zip = "Location is required.";
 
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
+
+  const moderationError = await moderateContent({ title, offering, seeking });
+  if (moderationError) return { error: moderationError };
 
   // Resolve ZIP to coordinates
   let latitude: number | null = null;

@@ -21,3 +21,21 @@ export async function deleteAssetAction(formData: FormData) {
 
   revalidatePath("/dashboard");
 }
+
+export async function bulkDeleteAssetsAction(ids: number[]) {
+  const token = await getValidToken();
+  if (!token) redirect("/login");
+
+  if (ids.length === 0) return;
+
+  await fetch(`${BASE_URL}/items/assets`, {
+    method: "DELETE",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(ids),
+  });
+
+  revalidatePath("/dashboard");
+}

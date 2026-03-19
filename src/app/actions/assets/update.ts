@@ -2,6 +2,7 @@
 
 import { redirect } from "next/navigation";
 import { getValidToken } from "@/lib/auth";
+import { moderateContent } from "@/utils/moderation";
 
 export type AssetFormState = {
   error?: string;
@@ -34,6 +35,9 @@ export async function updateAssetAction(
   if (!seeking) fieldErrors.seeking = "Describe what you need in return.";
 
   if (Object.keys(fieldErrors).length > 0) return { fieldErrors };
+
+  const moderationError = await moderateContent({ title, offering, seeking });
+  if (moderationError) return { error: moderationError };
 
   // Location — only re-resolve if a new ZIP was entered
   const newZip = (formData.get("newZip") as string)?.trim();
