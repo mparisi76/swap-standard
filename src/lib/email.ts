@@ -111,6 +111,53 @@ export async function sendOffererMatchDigest({ to, userId, firstName, matches }:
   });
 }
 
+export interface ChainTradeConfirmedData {
+  to: string;
+  userId: string;
+  firstName: string | null;
+  chainId: number;
+  yourAssetTitle: string;
+  partners: { firstName: string | null; assetTitle: string }[];
+}
+
+export async function sendChainTradeConfirmed({
+  to, userId, firstName, chainId, yourAssetTitle, partners,
+}: ChainTradeConfirmedData) {
+  const name = firstName ?? "Member";
+
+  const partnerRows = partners.map((p) => `
+    <tr>
+      <td style="padding:12px 16px;border-bottom:2px solid #e4e4e7">
+        <p style="margin:0 0 2px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">${p.firstName ?? "Member"}</p>
+        <p style="margin:0;font-size:13px;font-weight:900;text-transform:uppercase;color:#18181b">${p.assetTitle}</p>
+      </td>
+    </tr>`).join("");
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      All three members have accepted the chain trade. This is not a binding commitment —
+      it means everyone is interested and open to making it happen. Reach out to your trade partners to coordinate the details.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:2px solid #18181b;margin-bottom:24px">
+      <tr>
+        <td style="padding:12px 16px;background:#18181b;border-bottom:2px solid #18181b">
+          <p style="margin:0 0 2px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#a1a1aa">Your listing</p>
+          <p style="margin:0;font-size:13px;font-weight:900;text-transform:uppercase;color:#fff">${yourAssetTitle}</p>
+        </td>
+      </tr>
+      ${partnerRows}
+    </table>
+    <a href="${SITE_URL}/dashboard/chain-trades/${chainId}" style="display:inline-block;background:#18181b;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;text-decoration:none">View Trade →</a>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Your chain trade is confirmed — all members accepted",
+    html: baseTemplate("Chain Trade Confirmed", body, unsubscribeUrl(userId)),
+  });
+}
+
 export interface ChainTradeEmailData {
   to: string;
   userId: string;

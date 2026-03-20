@@ -11,7 +11,7 @@ const MAX_DISTANCE_MILES = 50;
 
 interface RawAssetRow {
   id: number;
-  user_created: string | { id: string; email: string };
+  user_created: string | { id: string; email: string } | null;
   title: string;
   offering_tags: string | null;
   seeking_tags: string | null;
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
   // 1. Fetch all published assets with tag data
   const assetsUrl = new URL(`${BASE_URL}/items/assets`);
   assetsUrl.searchParams.set("filter[status][_eq]", "published");
-  assetsUrl.searchParams.set("fields", "id,user_created,title,offering_tags,seeking_tags,latitude,longitude,user_created.email");
+  assetsUrl.searchParams.set("fields", "id,user_created.id,user_created.email,title,offering_tags,seeking_tags,latitude,longitude");
   assetsUrl.searchParams.set("limit", "-1");
 
   console.log("[chain-match] fetching assets...");
@@ -74,14 +74,15 @@ export async function POST(req: NextRequest) {
 
   const { data: assets }: { data: RawAssetRow[] } = await assetsRes.json();
   console.log(`[chain-match] fetched ${assets.length} assets`);
+  console.log("[chain-match] sample user_created:", JSON.stringify(assets.find(a => a.offering_tags)?.user_created));
 
   // Filter to assets that have both tag types populated, excluding seed users
   const eligible = assets
     .filter((a) => parseTags(a.offering_tags).length > 0 && parseTags(a.seeking_tags).length > 0 && a.user_created)
     .map((a): AssetRow => ({
       ...a,
-      user_created: typeof a.user_created === "object" ? a.user_created.id : (a.user_created as string),
-      _email: typeof a.user_created === "object" ? a.user_created.email : "",
+      user_created: typeof a.user_created === "object" && a.user_created !== null ? a.user_created.id : (a.user_created as unknown as string),
+      _email: typeof a.user_created === "object" && a.user_created !== null ? a.user_created.email : "",
     }))
     .filter((a) => !a._email.endsWith("@seed.swapstandard.com"));
   console.log(`[chain-match] ${eligible.length} eligible assets`);

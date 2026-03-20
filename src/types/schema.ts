@@ -60,7 +60,8 @@ export interface DirectMatchAsset {
   id: number;
   title: string;
   location_label: string | null;
-  user_created: { id: string; first_name: string | null; last_name: string | null };
+  seeking_tags: string | null;
+  user_created: { id: string; first_name: string | null; last_name: string | null } | null;
 }
 
 export interface DirectMatch {
