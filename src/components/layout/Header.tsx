@@ -65,7 +65,7 @@ export default function Header({ user }: { user?: User | null }) {
             </span>
           </span>
           <span className="block text-[0.55em] font-bold tracking-[0.2em] text-zinc-600 mt-1 normal-case">
-            Built on duty of care
+            Built on duty of care to our earth and one another
           </span>
         </Link>
 

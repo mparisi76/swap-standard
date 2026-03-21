@@ -111,6 +111,42 @@ export async function sendOffererMatchDigest({ to, userId, firstName, matches }:
   });
 }
 
+export interface CombinedMatchEmailData {
+  to: string;
+  userId: string;
+  firstName: string | null;
+  seeking: DirectMatchEmailData["matches"];
+  offering: DirectMatchEmailData["matches"];
+}
+
+export async function sendCombinedMatchDigest({ to, userId, firstName, seeking, offering }: CombinedMatchEmailData) {
+  const name = firstName ?? "Member";
+  const total = seeking.length + offering.length;
+
+  const seekingSection = seeking.length > 0 ? `
+    <p style="margin:0 0 12px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">Members offering what you're looking for</p>
+    ${seeking.slice(0, 3).map((m) => matchRow(m.yourAssetTitle, m.theirAssetTitle, m.assetId)).join("")}` : "";
+
+  const offeringSection = offering.length > 0 ? `
+    <p style="margin:${seeking.length > 0 ? "24px" : "0"} 0 12px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">Members looking for what you're offering</p>
+    ${offering.slice(0, 3).map((m) => matchRow(m.yourAssetTitle, m.theirAssetTitle, m.assetId)).join("")}` : "";
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      You have <strong>${total} new trade match${total > 1 ? "es" : ""}</strong> on SwapStandard.
+    </p>
+    ${seekingSection}
+    ${offeringSection}`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${total} new trade match${total > 1 ? "es" : ""} on SwapStandard`,
+    html: baseTemplate(`${total} Trade Match${total > 1 ? "es" : ""} Found`, body, unsubscribeUrl(userId)),
+  });
+}
+
 export interface ChainTradeConfirmedData {
   to: string;
   userId: string;

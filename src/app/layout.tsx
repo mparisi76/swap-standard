@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import { getValidToken } from "@/lib/auth";
+import { cookies } from "next/headers";
 import { createDirectus, rest, staticToken, readMe } from "@directus/sdk";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
@@ -65,7 +65,11 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const token = await getValidToken();
+  // Read token directly — no refresh here. Refreshing from a server component
+  // consumes the single-use refresh token without being able to save the new one.
+  // The middleware handles refresh correctly on /dashboard routes.
+  const cookieStore = await cookies();
+  const token = cookieStore.get("directus_session")?.value;
   let userData: UserData | undefined = undefined;
 
   if (token) {

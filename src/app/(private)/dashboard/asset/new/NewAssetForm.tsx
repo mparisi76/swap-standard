@@ -1,11 +1,12 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useState, useEffect } from "react";
 import {
   createAssetAction,
   type AssetFormState,
 } from "@/app/actions/assets/create";
 import { lookupZipCode } from "@/utils/geo";
+import { getUserLocation } from "@/utils/location-storage";
 import HoneypotField from "@/components/shared/HoneypotField";
 import { Loader, MapPin, CheckCircle } from "lucide-react";
 import PhotoUploader from "@/components/assets/PhotoUploader";
@@ -29,6 +30,17 @@ export default function NewAssetForm() {
   const [locationLabel, setLocationLabel] = useState("");
   const [zipLoading, setZipLoading] = useState(false);
   const [zipError, setZipError] = useState("");
+
+  useEffect(() => {
+    const saved = getUserLocation();
+    if (saved?.label) {
+      const extractedZip = saved.label.slice(-5);
+      if (/^\d{5}$/.test(extractedZip)) {
+        setZip(extractedZip);
+        setLocationLabel(saved.label);
+      }
+    }
+  }, []);
 
   const handleVerifyZip = async () => {
     const trimmed = zip.trim();
