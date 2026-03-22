@@ -103,7 +103,7 @@ export default function Header({ user }: { user?: User | null }) {
               </button>
               {profileOpen && (
                 <div className="absolute right-0 mt-3 w-48 bg-white border-2 border-zinc-900 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] py-2">
-                  <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-500">
+                  <div className="px-4 py-2 border-b-2 border-zinc-100 text-[8px] font-black text-zinc-500 truncate">
                     {user.email}
                   </div>
                   <Link
