@@ -74,6 +74,14 @@ export default function Footer() {
           <span className="font-mono text-label text-zinc-500 uppercase tracking-widest">
             &copy; {year} SwapStandard — All exchanges logged.
           </span>
+          <div className="flex gap-6">
+            <Link href="/terms" className="text-label font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-700 transition-colors">
+              Terms
+            </Link>
+            <Link href="/privacy" className="text-label font-bold uppercase tracking-widest text-zinc-500 hover:text-emerald-700 transition-colors">
+              Privacy
+            </Link>
+          </div>
         </div>
       </div>
     </footer>

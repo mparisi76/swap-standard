@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { cookies } from "next/headers";
-import { createDirectus, rest, staticToken, readMe } from "@directus/sdk";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/layout/Footer";
 
@@ -74,28 +73,20 @@ export default async function RootLayout({
 
   if (token) {
     try {
-      const client = createDirectus(process.env.NEXT_PUBLIC_DIRECTUS_URL!)
-        .with(staticToken(token))
-        .with(rest());
-
-      const user = (await client.request(
-        readMe({
-          fields: ["first_name", "last_name", "email", { role: ["name"] }],
-        }),
-      )) as {
-        first_name: string | null;
-        last_name: string | null;
-        email: string;
-        role?: { name: string };
-      };
-
-      userData = {
-        name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "N/A",
-        email: user.email,
-        role: user.role?.name || "Steward",
-      };
+      const res = await fetch(
+        `${process.env.NEXT_PUBLIC_DIRECTUS_URL}/users/me?fields=first_name,last_name,email,role.name`,
+        { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+      );
+      if (res.ok) {
+        const { data: user } = await res.json();
+        userData = {
+          name: `${user.first_name || ""} ${user.last_name || ""}`.trim() || "N/A",
+          email: user.email,
+          role: user.role?.name || "Steward",
+        };
+      }
     } catch {
-      console.error("Session fetch skipped or failed.");
+      // network error — show no avatar
     }
   }
 
