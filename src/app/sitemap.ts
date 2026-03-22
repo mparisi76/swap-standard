@@ -44,6 +44,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "hourly",
       priority: 0.9,
     },
+    {
+      url: `${siteUrl}/contact`,
+      lastModified: new Date("2026-03-01"),
+      changeFrequency: "monthly",
+      priority: 0.4,
+    },
+    {
+      url: `${siteUrl}/terms`,
+      lastModified: new Date("2026-03-01"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
+    {
+      url: `${siteUrl}/privacy`,
+      lastModified: new Date("2026-03-01"),
+      changeFrequency: "yearly",
+      priority: 0.3,
+    },
   ];
 
   const assetRoutes: MetadataRoute.Sitemap = assets.map((asset) => ({
