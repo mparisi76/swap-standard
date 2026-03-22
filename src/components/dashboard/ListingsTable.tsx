@@ -37,14 +37,24 @@ function FeatureButton({ assetId, featuredUntil }: { assetId: number; featuredUn
   };
 
   return (
-    <button
-      onClick={handleClick}
-      disabled={loading}
-      className="text-label font-black uppercase tracking-wider text-zinc-500 hover:text-emerald-700 transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1 shrink-0"
-    >
-      <Star size={11} />
-      {loading ? "..." : "Feature"}
-    </button>
+    <>
+      {loading && (
+        <div className="fixed inset-0 z-[100] bg-zinc-900/80 backdrop-blur-sm flex items-center justify-center">
+          <div className="border-4 border-zinc-900 bg-[#F9F8F6] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] px-10 py-8 text-center space-y-3">
+            <Star size={24} className="text-emerald-700 mx-auto animate-pulse" fill="currentColor" strokeWidth={0} />
+            <p className="text-body font-black uppercase tracking-widest text-zinc-900">Redirecting to checkout…</p>
+          </div>
+        </div>
+      )}
+      <button
+        onClick={handleClick}
+        disabled={loading}
+        className="text-label font-black uppercase tracking-wider text-zinc-500 hover:text-emerald-700 transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1 shrink-0"
+      >
+        <Star size={11} />
+        Feature
+      </button>
+    </>
   );
 }
 
