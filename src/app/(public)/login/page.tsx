@@ -14,6 +14,7 @@ function LoginForm() {
 
   const isRegistered = searchParams.get("registered") === "true";
   const isExpired = searchParams.get("error") === "session_expired";
+  const isReset = searchParams.get("reset") === "true";
 
   useEffect(() => {
     if (state?.error) {
@@ -59,6 +60,17 @@ function LoginForm() {
         </div>
       )}
 
+      {isReset && (
+        <div className="bg-emerald-700 p-4 text-center mb-8 space-y-1">
+          <p className="text-[10px] font-black uppercase tracking-[0.2em] text-white">
+            Password Updated
+          </p>
+          <p className="text-[10px] text-emerald-100 tracking-wide">
+            You can now log in with your new password.
+          </p>
+        </div>
+      )}
+
       <form action={formAction} className="space-y-6">
         <input type="hidden" name="callbackUrl" value={callbackUrl} />
         {state?.error && (
@@ -82,9 +94,17 @@ function LoginForm() {
         </div>
 
         <div className="space-y-2">
-          <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
-            Password
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-[10px] font-black uppercase tracking-widest text-zinc-500">
+              Password
+            </label>
+            <Link
+              href="/forgot-password"
+              className="text-[10px] font-bold uppercase tracking-widest text-zinc-400 hover:text-emerald-700 transition-colors"
+            >
+              Forgot?
+            </Link>
+          </div>
           <input
             name="password"
             type="password"

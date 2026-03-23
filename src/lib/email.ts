@@ -194,6 +194,33 @@ export async function sendChainTradeConfirmed({
   });
 }
 
+export interface PasswordResetEmailData {
+  to: string;
+  firstName: string | null;
+  token: string;
+}
+
+export async function sendPasswordResetEmail({ to, firstName, token }: PasswordResetEmailData) {
+  const name = firstName ?? "Member";
+  const resetUrl = `${SITE_URL}/reset-password?token=${token}`;
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      We received a request to reset your SwapStandard password. Click the button below to set a new one.
+      This link expires in <strong>1 hour</strong>.
+    </p>
+    <a href="${resetUrl}" style="display:inline-block;background:#18181b;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;text-decoration:none">Reset Password →</a>
+    <p style="margin:20px 0 0;font-size:11px;color:#71717a">If you didn't request this, you can safely ignore this email. Your password won't change.</p>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: "Reset your SwapStandard password",
+    html: baseTemplate("Password Reset", body),
+  });
+}
+
 export interface ChainTradeEmailData {
   to: string;
   userId: string;
