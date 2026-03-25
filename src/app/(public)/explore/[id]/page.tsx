@@ -6,6 +6,7 @@ import { ArrowLeft, Tag, Clock, Star } from "lucide-react";
 import { notFound } from "next/navigation";
 import { type Metadata } from "next";
 import AssetGallery from "@/components/explore/AssetGallery";
+import FlagButton from "@/components/explore/FlagButton";
 import RecentViewTracker from "@/components/explore/RecentViewTracker";
 import RecentlyViewed from "@/components/explore/RecentlyViewed";
 import SimilarItems from "@/components/explore/SimilarItems";
@@ -240,6 +241,12 @@ export default async function AssetDetailPage({
                 </Link>
               )}
             </div>
+
+            {!isOwner && (
+              <div className="pt-2">
+                <FlagButton assetId={asset.id} assetTitle={asset.title} />
+              </div>
+            )}
 
           </div>
         </div>

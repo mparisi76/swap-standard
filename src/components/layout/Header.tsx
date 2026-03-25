@@ -4,7 +4,7 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import { usePathname } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import { ChevronDown, Settings, LogOut, Menu, X } from "lucide-react";
+import { ChevronDown, Settings, LogOut, Menu, X, Flag } from "lucide-react";
 import TextScaler from "./TextScaler";
 import LocationPill from "./LocationPill";
 import { logoutAction } from "@/app/actions/auth/logout";
@@ -113,6 +113,15 @@ export default function Header({ user }: { user?: User | null }) {
                   >
                     <Settings size={12} /> Settings
                   </Link>
+                  {user.role === "Administrator" && (
+                    <Link
+                      href="/admin/flags"
+                      onClick={() => setIsProfileOpen(false)}
+                      className="flex items-center gap-2 px-4 py-2 text-[10px] font-bold uppercase hover:bg-zinc-50 text-red-600"
+                    >
+                      <Flag size={12} /> Flags
+                    </Link>
+                  )}
                   <form action={logoutAction}>
                     <input type="hidden" name="returnTo" value={pathname} />
                     <button

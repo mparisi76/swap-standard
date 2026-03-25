@@ -6,6 +6,7 @@ import { getValidTokenWithUser } from "@/lib/auth";
 import { type Exchange, type ExchangeMessage } from "@/types/schema";
 import StatusActions from "./StatusActions";
 import ReplyForm from "./ReplyForm";
+import AutoRefresh from "./AutoRefresh";
 
 export const dynamic = "force-dynamic";
 
@@ -14,6 +15,7 @@ export const metadata: Metadata = {
 };
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 
 const EXCHANGE_FIELDS = [
   "id", "status", "date_created", "date_updated",
@@ -47,12 +49,12 @@ export default async function ExchangeThreadPage({
 
   const [exchangeRes, messagesRes] = await Promise.all([
     fetch(`${BASE_URL}/items/exchanges?filter[id][_eq]=${id}&fields=${EXCHANGE_FIELDS}&limit=1`, {
-      headers: { Authorization: `Bearer ${token}` },
+      headers: { Authorization: `Bearer ${STATIC_TOKEN}` },
       cache: "no-store",
     }),
     fetch(
       `${BASE_URL}/items/exchange_messages?filter[exchange][_eq]=${id}&fields=id,sender.id,sender.first_name,sender.last_name,content,date_created&sort=date_created&limit=100`,
-      { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+      { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
     ),
   ]);
 
@@ -67,6 +69,11 @@ export default async function ExchangeThreadPage({
   if (!exchange) notFound();
   const ex = exchange!;
 
+  // Ensure the current user is a party to this exchange
+  const initiatorId = resolveUserId(ex.initiator as UserField);
+  const ownerId = resolveUserId(ex.owner as UserField);
+  if (userId !== initiatorId && userId !== ownerId) notFound();
+
   const messagesText = await messagesRes.text();
   const messages: ExchangeMessage[] = messagesRes.ok && messagesText
     ? (JSON.parse(messagesText).data ?? [])
@@ -78,6 +85,7 @@ export default async function ExchangeThreadPage({
 
   return (
     <main className="flex flex-col bg-[#F9F8F6] overflow-hidden" style={{ height: "calc(100dvh - 72px)" }}>
+      <AutoRefresh intervalMs={15000} />
 
       {/* Breadcrumb */}
       <div className="border-b-2 border-zinc-900 bg-white shrink-0">
@@ -125,9 +133,14 @@ export default async function ExchangeThreadPage({
                 )}
               </div>
               <div className="min-w-0 flex-1">
-                <span className="bg-zinc-900 text-white text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px]">
-                  {ex.asset.type}
-                </span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="bg-zinc-900 text-white text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px]">
+                    {ex.asset.type}
+                  </span>
+                  <span className={`text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px] ${isOwner ? "bg-emerald-700 text-white" : "bg-zinc-100 text-zinc-500"}`}>
+                    {isOwner ? "Your listing" : "Their listing"}
+                  </span>
+                </div>
                 <h2 className="text-body font-black uppercase italic text-zinc-900 mt-1 leading-tight">
                   {ex.asset.title}
                 </h2>
@@ -198,9 +211,6 @@ export default async function ExchangeThreadPage({
             {/* Reply form — always anchored at bottom */}
             {!isClosed && (
               <div className="border-t-2 border-zinc-900 px-6 py-5 space-y-3 bg-[#F9F8F6] shrink-0">
-                <p className="text-detail text-zinc-500 italic">
-                  Refresh to see new messages from the other party.
-                </p>
                 <ReplyForm exchangeId={ex.id} />
               </div>
             )}

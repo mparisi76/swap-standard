@@ -48,20 +48,22 @@ async function getMyAssets(token: string): Promise<Asset[]> {
   return (json.data as Asset[]) ?? [];
 }
 
-async function getMyExchanges(token: string): Promise<Exchange[]> {
+async function getMyExchanges(userId: string): Promise<Exchange[]> {
   const url = new URL(`${BASE_URL}/items/exchanges`);
   url.searchParams.set(
     "fields",
     "id,status,date_updated,asset.id,asset.title,asset.type,initiator.id,initiator.first_name,initiator.last_name,owner.id,owner.first_name,owner.last_name",
   );
-  url.searchParams.set("filter[_and][0][_or][0][initiator][_eq]", "$CURRENT_USER");
-  url.searchParams.set("filter[_and][0][_or][1][owner][_eq]", "$CURRENT_USER");
-  url.searchParams.set("filter[_and][1][status][_nin]", "completed,declined");
+  url.searchParams.set("filter[_and][0][_or][0][initiator][_eq]", userId);
+  url.searchParams.set("filter[_and][0][_or][1][owner][_eq]", userId);
+  url.searchParams.append("filter[_and][1][status][_nin][]", "completed");
+  url.searchParams.append("filter[_and][1][status][_nin][]", "declined");
+  url.searchParams.append("filter[_and][1][status][_nin][]", "cancelled");
   url.searchParams.set("sort", "-date_updated");
   url.searchParams.set("limit", "20");
 
   const res = await fetch(url.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
+    headers: { Authorization: `Bearer ${STATIC_TOKEN}` },
     cache: "no-store",
   });
   if (!res.ok) return [];
@@ -131,7 +133,7 @@ export default async function DashboardPage() {
 
   const [items, exchanges, matches, chainTrades] = await Promise.all([
     getMyAssets(token),
-    getMyExchanges(token),
+    getMyExchanges(userId),
     getMyMatches(userId),
     getMyChainTrades(userId),
   ]);
@@ -157,7 +159,7 @@ export default async function DashboardPage() {
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
           <Link
             href="/dashboard/asset/new"
-            className="col-span-2 md:col-span-1 border-4 border-zinc-900 p-6 md:p-8 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+            className="border-4 border-zinc-900 p-6 md:p-8 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
           >
             <Plus size={20} className="mb-3 text-emerald-700 group-hover:text-white transition-colors" />
             <h2 className="text-body font-black uppercase">New Listing</h2>

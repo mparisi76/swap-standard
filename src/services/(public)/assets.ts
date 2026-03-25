@@ -20,7 +20,10 @@ const buildFilters = (params: {
 }) => {
   const { type, search, userLat, userLng, radius = DEFAULT_RADIUS_MILES } = params;
 
-  const andFilters: DirectusFilter[] = [{ status: { _eq: "published" } }];
+  const andFilters: DirectusFilter[] = [
+    { status: { _eq: "published" } },
+    { asset_status: { _neq: "unavailable" } },
+  ];
 
   if (type && type !== "all") {
     andFilters.push({ type: { _eq: type } });

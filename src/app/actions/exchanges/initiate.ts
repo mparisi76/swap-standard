@@ -9,6 +9,7 @@ export type ExchangeFormState = {
 } | null;
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 
 async function safeJson(res: Response): Promise<unknown> {
   const text = await res.text();
@@ -47,11 +48,11 @@ export async function initiateExchangeAction(
     return { error: "You cannot initiate an exchange on your own listing." };
   }
 
-  // Create exchange
+  // Create exchange using static token so the full item is returned
   const exchangeRes = await fetch(`${BASE_URL}/items/exchanges`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${STATIC_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
@@ -67,29 +68,15 @@ export async function initiateExchangeAction(
     return { error: err?.errors?.[0]?.message || "Failed to create exchange." };
   }
 
-  // Directus may not return the id in the POST response — fetch the newly created exchange.
-  const findUrl = new URL(`${BASE_URL}/items/exchanges`);
-  findUrl.searchParams.set("filter[initiator][_eq]", "$CURRENT_USER");
-  findUrl.searchParams.set("filter[asset][_eq]", assetId);
-  findUrl.searchParams.set("sort", "-date_created");
-  findUrl.searchParams.set("limit", "1");
-  findUrl.searchParams.set("fields", "id");
-
-  const findRes = await fetch(findUrl.toString(), {
-    headers: { Authorization: `Bearer ${token}` },
-    cache: "no-store",
-  });
-  const findText = await findRes.text();
-  if (!findRes.ok) return { error: `Exchange created but retrieval failed (${findRes.status}): ${findText.slice(0, 300)}` };
-  const findJson = (findText ? JSON.parse(findText) : null) as { data: { id: number }[] } | null;
-  const exchangeId: number | undefined = findJson?.data?.[0]?.id;
-  if (!exchangeId) return { error: `Exchange created but ID not found. Body: ${findText.slice(0, 300)}` };
+  const exchangeJson = await safeJson(exchangeRes) as { data?: { id: number } } | null;
+  const exchangeId: number | undefined = exchangeJson?.data?.id;
+  if (!exchangeId) return { error: "Exchange created but ID could not be read. Please contact support." };
 
   // Create opening message
   const msgRes = await fetch(`${BASE_URL}/items/exchange_messages`, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${STATIC_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({

@@ -9,6 +9,7 @@ export type UpdateStatusState = {
 } | null;
 
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
+const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 
 async function safeJson(res: Response): Promise<unknown> {
   const text = await res.text();
@@ -28,11 +29,11 @@ export async function updateExchangeStatusAction(
 
   // Fetch current exchange state
   const checkRes = await fetch(
-    `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=status,initiator.id,owner.id&limit=1`,
-    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+    `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=status,asset.id,initiator.id,owner.id&limit=1`,
+    { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
   );
   if (!checkRes.ok) return { error: "Exchange not found." };
-  const checkJson = await safeJson(checkRes) as { data: { status: string; initiator: { id: string }; owner: { id: string } }[] } | null;
+  const checkJson = await safeJson(checkRes) as { data: { status: string; asset: { id: number }; initiator: { id: string }; owner: { id: string } }[] } | null;
   if (!checkJson?.data?.[0]) return { error: "Exchange not found." };
   const ex = checkJson.data[0];
 
@@ -52,11 +53,14 @@ export async function updateExchangeStatusAction(
   if (!["pending", "active"].includes(ex.status)) {
     return { error: "This exchange is already closed." };
   }
+  if (newStatus === "cancelled" && !isOwner && !isInitiator) {
+    return { error: "Not authorised." };
+  }
 
   const res = await fetch(`${BASE_URL}/items/exchanges/${exchangeId}`, {
     method: "PATCH",
     headers: {
-      Authorization: `Bearer ${token}`,
+      Authorization: `Bearer ${STATIC_TOKEN}`,
       "Content-Type": "application/json",
     },
     body: JSON.stringify({ status: newStatus }),
@@ -67,7 +71,27 @@ export async function updateExchangeStatusAction(
     return { error: err?.errors?.[0]?.message || "Failed to update status." };
   }
 
+  // Sync asset with exchange status
+  const assetUpdates: Partial<Record<ExchangeStatus, object>> = {
+    active:    { asset_status: "pending" },
+    completed: { asset_status: "unavailable", status: "archived" },
+    declined:  { asset_status: "available" },
+    cancelled: { asset_status: "available" },
+  };
+  const assetPatch = assetUpdates[newStatus];
+  if (assetPatch && ex.asset?.id) {
+    await fetch(`${BASE_URL}/items/assets/${ex.asset.id}`, {
+      method: "PATCH",
+      headers: {
+        Authorization: `Bearer ${STATIC_TOKEN}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(assetPatch),
+    });
+  }
+
   revalidatePath(`/dashboard/exchanges/${exchangeId}`);
   revalidatePath("/dashboard");
+  revalidatePath(`/explore/${ex.asset?.id}`);
   return null;
 }

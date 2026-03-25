@@ -11,6 +11,8 @@ function LoginForm() {
   const searchParams = useSearchParams();
   const turnstileRef = useRef<TurnstileInstance>(null);
   const [turnstileVerified, setTurnstileVerified] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
   const isRegistered = searchParams.get("registered") === "true";
   const isExpired = searchParams.get("error") === "session_expired";
@@ -89,6 +91,8 @@ function LoginForm() {
             name="email"
             type="email"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             className="w-full border-2 border-zinc-900 px-4 py-3 outline-none text-sm bg-zinc-50 font-bold text-zinc-900"
           />
         </div>
@@ -109,6 +113,8 @@ function LoginForm() {
             name="password"
             type="password"
             required
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
             className="w-full border-2 border-zinc-900 px-4 py-3 outline-none text-sm bg-zinc-50 font-bold text-zinc-900"
           />
         </div>

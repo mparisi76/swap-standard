@@ -83,7 +83,7 @@ export interface SwapSchema {
   chain_trades: ChainTrade[];
 }
 
-export type ExchangeStatus = 'pending' | 'active' | 'completed' | 'declined';
+export type ExchangeStatus = 'pending' | 'active' | 'completed' | 'declined' | 'cancelled';
 
 export interface ExchangeUser {
   id: string;
