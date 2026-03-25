@@ -20,10 +20,7 @@ const buildFilters = (params: {
 }) => {
   const { type, search, userLat, userLng, radius = DEFAULT_RADIUS_MILES } = params;
 
-  const andFilters: DirectusFilter[] = [
-    { status: { _eq: "published" } },
-    { asset_status: { _neq: "unavailable" } },
-  ];
+  const andFilters: DirectusFilter[] = [{ status: { _eq: "published" } }];
 
   if (type && type !== "all") {
     andFilters.push({ type: { _eq: type } });
@@ -81,7 +78,7 @@ export const getAssets = cache(
       }),
     );
 
-    let assets = data as Asset[];
+    let assets = (data as Asset[]).filter((a) => a.asset_status !== "unavailable");
 
     // Tag filtering must be done in JS — CSV fields don't support Directus filter operators
     if (hasTags) {
