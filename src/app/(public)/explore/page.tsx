@@ -95,8 +95,12 @@ export default async function ExplorePage({
       <Suspense fallback={null}>
         <LocationInterstitial />
       </Suspense>
-      <LocationPrompt />
-      <ControlBar />
+      <Suspense fallback={null}>
+        <LocationPrompt />
+      </Suspense>
+      <Suspense fallback={null}>
+        <ControlBar />
+      </Suspense>
 
       <div className="max-w-400 mx-auto px-6 py-8">
         {/* Search Bar goes here, acting as the primary command center for the feed */}
