@@ -81,7 +81,7 @@ export default async function ExchangeThreadPage({
 
   const isOwner = resolveUserId(ex.owner as UserField) === userId;
   const counterparty = isOwner ? ex.initiator : ex.owner;
-  const isClosed = ex.status === "completed" || ex.status === "declined";
+  const isClosed = ex.status === "completed" || ex.status === "declined" || !ex.asset;
 
   return (
     <main className="flex flex-col bg-[#F9F8F6] overflow-hidden" style={{ height: "calc(100dvh - 72px)" }}>

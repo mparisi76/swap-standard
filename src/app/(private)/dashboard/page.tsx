@@ -133,12 +133,16 @@ export default async function DashboardPage() {
   if (!auth) redirect("/login");
   const { token, userId } = auth;
 
-  const [items, exchanges, matches, chainTrades] = await Promise.all([
+  const [items, exchangesRaw, matchesRaw, chainTradesRaw] = await Promise.all([
     getMyAssets(token),
     getMyExchanges(userId),
     getMyMatches(userId),
     getMyChainTrades(userId),
   ]);
+
+  const exchanges = exchangesRaw.filter((ex) => ex.asset && ex.owner && ex.initiator);
+  const matches = matchesRaw.filter((m) => m.asset_a && m.asset_b);
+  const chainTrades = chainTradesRaw.filter((c) => c.asset_a && c.asset_b && c.asset_c);
 
   const published = items.filter((i) => i.status === "published").length;
   const drafts = items.filter((i) => i.status === "draft").length;
