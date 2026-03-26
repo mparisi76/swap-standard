@@ -209,7 +209,7 @@ export default async function DashboardPage() {
 
             <div className="border-2 border-zinc-900 bg-white divide-y-2 divide-zinc-100">
               {exchanges.map((ex) => {
-                const counterparty = ex.owner.id === userId ? ex.initiator : ex.owner;
+                const counterparty = ex.owner?.id === userId ? ex.initiator : ex.owner;
                 return (
                   <Link
                     key={ex.id}
@@ -219,10 +219,10 @@ export default async function DashboardPage() {
                     {/* Asset title + counterparty */}
                     <div className="flex-1 min-w-0">
                       <p className="text-body font-black uppercase text-zinc-900 truncate">
-                        {ex.asset.title}
+                        {ex.asset?.title ?? "Deleted listing"}
                       </p>
                       <p className="text-label font-bold uppercase text-zinc-500">
-                        With {memberName(counterparty)}
+                        With {counterparty ? memberName(counterparty) : "Unknown"}
                       </p>
                     </div>
 
