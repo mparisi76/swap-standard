@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect, useTransition } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { Copy, Trash2, Star, X } from "lucide-react";
 import { Asset } from "@/types/schema";
@@ -120,14 +121,28 @@ function FilterPill({
 }
 
 export default function ListingsTable({ items }: { items: Asset[] }) {
+  const router = useRouter();
+
+  // Always refresh server data on mount so navigating back shows the latest state
+  useEffect(() => {
+    router.refresh();
+  }, [router]);
+
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState<TypeFilter>("all");
   const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
   const [selected, setSelected] = useState<Set<number>>(new Set());
   const [isPending, startTransition] = useTransition();
   const [confirmDelete, setConfirmDelete] = useState<{ ids: number[]; titles: string[] } | null>(null);
+  const [statusOverrides, setStatusOverrides] = useState<Record<number, Partial<Pick<Asset, "status" | "asset_status">>>>({});
 
-  const filtered = items.filter((item) => {
+  const patchStatus = (id: number, patch: Partial<Pick<Asset, "status" | "asset_status">>) => {
+    setStatusOverrides((prev) => ({ ...prev, [id]: { ...prev[id], ...patch } }));
+  };
+
+  const mergedItems = items.map((item) => ({ ...item, ...statusOverrides[item.id] }));
+
+  const filtered = mergedItems.filter((item) => {
     const typeMatch = typeFilter === "all" || item.type === typeFilter;
     const statusMatch = statusFilter === "all" || item.status === statusFilter;
     const searchMatch = !search.trim() || item.title.toLowerCase().includes(search.toLowerCase());
@@ -324,10 +339,10 @@ export default function ListingsTable({ items }: { items: Asset[] }) {
               {/* Status selects — inline row on mobile */}
               <div className="flex items-center gap-4">
                 <div className="shrink-0">
-                  <PublishStatusSelect assetId={item.id} current={item.status} />
+                  <PublishStatusSelect key={item.status} assetId={item.id} current={item.status} onStatusChange={(s) => patchStatus(item.id, { status: s })} />
                 </div>
                 <div className="shrink-0">
-                  <AssetStatusSelect assetId={item.id} current={item.asset_status} />
+                  <AssetStatusSelect key={item.asset_status} assetId={item.id} current={item.asset_status} onStatusChange={(s) => patchStatus(item.id, { asset_status: s })} />
                 </div>
                 <span className="font-mono text-label text-zinc-500 shrink-0 hidden md:block">
                   {formatDate(item.date_created)}
