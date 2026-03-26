@@ -23,6 +23,7 @@ const EXCHANGE_STATUS_BADGE: Record<ExchangeStatus, string> = {
   active:    "text-emerald-700",
   completed: "text-zinc-500",
   declined:  "text-zinc-500 opacity-60",
+  cancelled: "text-zinc-500 opacity-60",
 };
 
 const EXCHANGE_STATUS_LABEL: Record<ExchangeStatus, string> = {
@@ -30,6 +31,7 @@ const EXCHANGE_STATUS_LABEL: Record<ExchangeStatus, string> = {
   active:    "Active",
   completed: "Completed",
   declined:  "Declined",
+  cancelled: "Cancelled",
 };
 
 async function getMyAssets(token: string): Promise<Asset[]> {
