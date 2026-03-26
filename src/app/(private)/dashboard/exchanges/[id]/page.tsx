@@ -111,44 +111,52 @@ export default async function ExchangeThreadPage({
           <div className="border-2 border-zinc-900 bg-white">
 
             {/* Asset row */}
-            <Link
-              href={`/explore/${ex.asset.id}`}
-              className="flex gap-4 p-5 border-b-2 border-zinc-900 hover:bg-zinc-50 transition-colors group"
-            >
-              <div className="w-16 h-16 shrink-0 border-2 border-zinc-900 bg-zinc-100 overflow-hidden relative">
-                <div className="absolute top-0 right-0 bg-zinc-900 text-white text-[8px] px-1 font-mono uppercase z-10">
-                  IMG
-                </div>
-                {ex.asset.thumbnail ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={`${BASE_URL}/assets/${ex.asset.thumbnail}?width=160`}
-                    alt={ex.asset.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                ) : (
-                  <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-400 uppercase">
-                    Empty
+            {ex.asset ? (
+              <Link
+                href={`/explore/${ex.asset.id}`}
+                className="flex gap-4 p-5 border-b-2 border-zinc-900 hover:bg-zinc-50 transition-colors group"
+              >
+                <div className="w-16 h-16 shrink-0 border-2 border-zinc-900 bg-zinc-100 overflow-hidden relative">
+                  <div className="absolute top-0 right-0 bg-zinc-900 text-white text-[8px] px-1 font-mono uppercase z-10">
+                    IMG
                   </div>
-                )}
-              </div>
-              <div className="min-w-0 flex-1">
-                <div className="flex items-center gap-2 flex-wrap">
-                  <span className="bg-zinc-900 text-white text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px]">
-                    {ex.asset.type}
-                  </span>
-                  <span className={`text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px] ${isOwner ? "bg-emerald-700 text-white" : "bg-zinc-100 text-zinc-500"}`}>
-                    {isOwner ? "Your listing" : "Their listing"}
-                  </span>
+                  {ex.asset.thumbnail ? (
+                    // eslint-disable-next-line @next/next/no-img-element
+                    <img
+                      src={`${BASE_URL}/assets/${ex.asset.thumbnail}?width=160`}
+                      alt={ex.asset.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex items-center justify-center text-[10px] font-mono text-zinc-400 uppercase">
+                      Empty
+                    </div>
+                  )}
                 </div>
-                <h2 className="text-body font-black uppercase italic text-zinc-900 mt-1 leading-tight">
-                  {ex.asset.title}
-                </h2>
+                <div className="min-w-0 flex-1">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="bg-zinc-900 text-white text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px]">
+                      {ex.asset.type}
+                    </span>
+                    <span className={`text-label font-black px-2 py-0.5 uppercase tracking-wider text-[10px] ${isOwner ? "bg-emerald-700 text-white" : "bg-zinc-100 text-zinc-500"}`}>
+                      {isOwner ? "Your listing" : "Their listing"}
+                    </span>
+                  </div>
+                  <h2 className="text-body font-black uppercase italic text-zinc-900 mt-1 leading-tight">
+                    {ex.asset.title}
+                  </h2>
+                </div>
+                <span className="text-label font-bold text-emerald-700 uppercase tracking-wide shrink-0 self-center">
+                  View →
+                </span>
+              </Link>
+            ) : (
+              <div className="flex gap-4 p-5 border-b-2 border-zinc-900">
+                <div className="min-w-0 flex-1">
+                  <p className="text-body font-black uppercase italic text-zinc-500">Listing deleted</p>
+                </div>
               </div>
-              <span className="text-label font-bold text-emerald-700 uppercase tracking-wide shrink-0 self-center">
-                View →
-              </span>
-            </Link>
+            )}
 
             {/* Exchange metadata + status */}
             <div className="p-5 space-y-4">
