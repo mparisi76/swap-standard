@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, useState, useEffect, useRef } from "react";
+import { useActionState, useState, useEffect, useRef, useCallback } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import { registerAction } from "@/app/actions/auth/register";
 import Link from "next/link";
 import { Turnstile, type TurnstileInstance } from "@marsidev/react-turnstile";
@@ -19,6 +20,9 @@ export default function RegisterPage() {
   }, [state?.error]);
 
   // Keep track of form values so they don't vanish
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -69,7 +73,12 @@ export default function RegisterPage() {
             
             <div>
               <label className="text-[10px] font-black uppercase text-zinc-500 mb-1 block">Password</label>
-              <input name="password" value={formData.password} onChange={handleChange} type="password" required className="border-2 border-zinc-900 p-3 w-full bg-white text-zinc-900 font-bold" />
+              <div className="relative">
+                <input name="password" value={formData.password} onChange={handleChange} type={showPassword ? "text" : "password"} required className="border-2 border-zinc-900 p-3 pr-10 w-full bg-white text-zinc-900 font-bold" />
+                <button type="button" onClick={togglePassword} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 transition-colors">
+                  {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+                </button>
+              </div>
             </div>
           </div>
 

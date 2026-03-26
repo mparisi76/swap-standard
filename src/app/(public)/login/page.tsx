@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState, Suspense, useEffect, useRef, useState } from "react";
+import { useActionState, Suspense, useEffect, useRef, useState, useCallback } from "react";
+import { Eye, EyeOff } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { loginAction } from "@/app/actions/auth/login";
@@ -13,6 +14,8 @@ function LoginForm() {
   const [turnstileVerified, setTurnstileVerified] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const togglePassword = useCallback(() => setShowPassword((v) => !v), []);
 
   const isRegistered = searchParams.get("registered") === "true";
   const isExpired = searchParams.get("error") === "session_expired";
@@ -109,14 +112,19 @@ function LoginForm() {
               Forgot?
             </Link>
           </div>
-          <input
-            name="password"
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            className="w-full border-2 border-zinc-900 px-4 py-3 outline-none text-sm bg-zinc-50 font-bold text-zinc-900"
-          />
+          <div className="relative">
+            <input
+              name="password"
+              type={showPassword ? "text" : "password"}
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full border-2 border-zinc-900 px-4 py-3 pr-10 outline-none text-sm bg-zinc-50 font-bold text-zinc-900"
+            />
+            <button type="button" onClick={togglePassword} className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-900 transition-colors">
+              {showPassword ? <EyeOff size={16} /> : <Eye size={16} />}
+            </button>
+          </div>
         </div>
 
         <Turnstile
