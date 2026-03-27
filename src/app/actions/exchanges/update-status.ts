@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getValidTokenWithUser } from "@/lib/auth";
 import { type ExchangeStatus } from "@/types/schema";
+import { sendExchangeStatusNotification } from "@/lib/email";
 
 export type UpdateStatusState = {
   error?: string;
@@ -29,11 +30,11 @@ export async function updateExchangeStatusAction(
 
   // Fetch current exchange state
   const checkRes = await fetch(
-    `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=status,asset.id,initiator.id,owner.id&limit=1`,
+    `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=status,asset.id,asset.title,initiator.id,initiator.first_name,initiator.last_name,owner.id,owner.first_name,owner.last_name&limit=1`,
     { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
   );
   if (!checkRes.ok) return { error: "Exchange not found." };
-  const checkJson = await safeJson(checkRes) as { data: { status: string; asset: { id: number }; initiator: { id: string }; owner: { id: string } }[] } | null;
+  const checkJson = await safeJson(checkRes) as { data: { status: string; asset: { id: number; title: string }; initiator: { id: string; first_name: string | null; last_name: string | null }; owner: { id: string; first_name: string | null; last_name: string | null } }[] } | null;
   if (!checkJson?.data?.[0]) return { error: "Exchange not found." };
   const ex = checkJson.data[0];
 
@@ -88,6 +89,40 @@ export async function updateExchangeStatusAction(
       },
       body: JSON.stringify(assetPatch),
     });
+  }
+
+  // Notify counterparty of status change (fire and forget)
+  if (["active", "declined", "cancelled", "completed"].includes(newStatus)) {
+    try {
+      const actor = isOwner ? ex.owner : ex.initiator;
+      const counterparty = isOwner ? ex.initiator : ex.owner;
+      const actorName = `${actor.first_name ?? ""} ${actor.last_name ?? ""}`.trim() || "A member";
+
+      if (counterparty?.id) {
+        // Fetch counterparty's notification prefs directly — relational expansion
+        // on directus_users custom fields is unreliable
+        const cpRes = await fetch(
+          `${BASE_URL}/users/${counterparty.id}?fields=email,email_unsubscribed,notify_activity`,
+          { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
+        );
+        if (cpRes.ok) {
+          const { data: cp } = await cpRes.json();
+          if (cp?.email && !cp.email_unsubscribed && cp.notify_activity !== false) {
+            await sendExchangeStatusNotification({
+              to: cp.email,
+              userId: counterparty.id,
+              firstName: counterparty.first_name,
+              counterpartyName: actorName,
+              assetTitle: ex.asset?.title ?? "your listing",
+              exchangeId,
+              newStatus: newStatus as "active" | "declined" | "cancelled" | "completed",
+            });
+          }
+        }
+      }
+    } catch {
+      // Don't fail the action if email sending fails
+    }
   }
 
   revalidatePath(`/dashboard/exchanges/${exchangeId}`);

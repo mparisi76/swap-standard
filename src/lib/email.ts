@@ -264,6 +264,52 @@ export async function sendExchangeMessageNotification({
   });
 }
 
+export interface ExchangeStatusEmailData {
+  to: string;
+  userId: string;
+  firstName: string | null;
+  counterpartyName: string;
+  assetTitle: string;
+  exchangeId: number;
+  newStatus: "active" | "declined" | "cancelled" | "completed";
+}
+
+const STATUS_COPY: Record<ExchangeStatusEmailData["newStatus"], { subject: string; heading: string; body: string }> = {
+  active:    { subject: "Your exchange has been accepted", heading: "Exchange Accepted",   body: "has accepted your exchange request." },
+  declined:  { subject: "Your exchange was declined",     heading: "Exchange Declined",   body: "has declined your exchange request." },
+  cancelled: { subject: "An exchange was cancelled",      heading: "Exchange Cancelled",  body: "has cancelled this exchange." },
+  completed: { subject: "Exchange marked as complete",    heading: "Exchange Completed",  body: "has marked this exchange as complete." },
+};
+
+export async function sendExchangeStatusNotification({
+  to, userId, firstName, counterpartyName, assetTitle, exchangeId, newStatus,
+}: ExchangeStatusEmailData) {
+  const name = firstName ?? "Member";
+  const copy = STATUS_COPY[newStatus];
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      <strong>${counterpartyName}</strong> ${copy.body}
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:2px solid #18181b;margin-bottom:24px">
+      <tr>
+        <td style="padding:16px;background:#f4f4f5">
+          <p style="margin:0 0 4px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">Listing</p>
+          <p style="margin:0;font-size:14px;font-weight:900;text-transform:uppercase;color:#18181b">${assetTitle}</p>
+        </td>
+      </tr>
+    </table>
+    <a href="${SITE_URL}/dashboard/exchanges/${exchangeId}" style="display:inline-block;background:#18181b;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;text-decoration:none">View Exchange →</a>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: copy.subject,
+    html: baseTemplate(copy.heading, body, unsubscribeUrl(userId)),
+  });
+}
+
 export interface ChainTradeEmailData {
   to: string;
   userId: string;

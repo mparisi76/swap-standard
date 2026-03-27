@@ -55,7 +55,7 @@ export async function replyAction(
   // Send email notification to counterparty (fire and forget)
   try {
     const exRes = await fetch(
-      `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=asset.title,initiator.id,initiator.first_name,initiator.last_name,initiator.email,initiator.email_unsubscribed,initiator.notify_messages,owner.id,owner.first_name,owner.last_name,owner.email,owner.email_unsubscribed,owner.notify_messages&limit=1`,
+      `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=asset.title,initiator.id,initiator.first_name,initiator.last_name,owner.id,owner.first_name,owner.last_name&limit=1`,
       { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
     );
     if (exRes.ok) {
@@ -66,16 +66,28 @@ export async function replyAction(
         const counterparty = isInitiator ? ex.owner : ex.initiator;
         const sender = isInitiator ? ex.initiator : ex.owner;
         const senderName = `${sender?.first_name ?? ""} ${sender?.last_name ?? ""}`.trim() || "A member";
-        if (counterparty?.email) {
-          await sendExchangeMessageNotification({
-            to: counterparty.email,
-            userId: counterparty.id,
-            firstName: counterparty.first_name,
-            senderName,
-            assetTitle: ex.asset?.title ?? "your listing",
-            exchangeId,
-            messagePreview: content,
-          });
+
+        if (counterparty?.id) {
+          // Fetch counterparty's notification prefs directly — relational expansion
+          // on directus_users custom fields is unreliable
+          const cpRes = await fetch(
+            `${BASE_URL}/users/${counterparty.id}?fields=email,email_unsubscribed,notify_messages`,
+            { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
+          );
+          if (cpRes.ok) {
+            const { data: cp } = await cpRes.json();
+            if (cp?.email && !cp.email_unsubscribed && cp.notify_messages !== false) {
+              await sendExchangeMessageNotification({
+                to: cp.email,
+                userId: counterparty.id,
+                firstName: counterparty.first_name,
+                senderName,
+                assetTitle: ex.asset?.title ?? "your listing",
+                exchangeId,
+                messagePreview: content,
+              });
+            }
+          }
         }
       }
     }
