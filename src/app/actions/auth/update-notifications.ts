@@ -8,7 +8,7 @@ const STATIC_TOKEN = process.env.DIRECTUS_STATIC_TOKEN!;
 
 export async function updateNotificationsAction(formData: FormData) {
   const auth = await getValidTokenWithUser();
-  if (!auth) return { error: "Not authenticated." };
+  if (!auth) return;
 
   const unsubscribed = formData.get("email_unsubscribed") !== "on";
 
