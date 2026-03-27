@@ -17,9 +17,10 @@ export async function updateNotificationsAction(formData: FormData) {
       "Content-Type": "application/json",
     },
     body: JSON.stringify({
-      notify_matches:  formData.get("notify_matches")  === "true",
-      notify_messages: formData.get("notify_messages") === "true",
-      notify_activity: formData.get("notify_activity") === "true",
+      notify_matches:     formData.get("notify_matches")  === "true",
+      notify_messages:    formData.get("notify_messages") === "true",
+      notify_activity:    formData.get("notify_activity") === "true",
+      email_unsubscribed: false,
     }),
   });
 

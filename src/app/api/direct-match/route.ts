@@ -181,6 +181,15 @@ export async function POST(req: NextRequest) {
       userOffering.get(m.user_b)!.push({ yourAssetTitle: m.title_b, theirAssetTitle: m.title_a, assetId: m.asset_b });
     }
 
+    // Deduplicate: mutual matches (A→B and B→A) appear in both seeking and offering
+    // for the same user with identical asset pairs — keep only the seeking entry
+    for (const [uid, offeringEntries] of userOffering) {
+      const seekingKeys = new Set((userSeeking.get(uid) ?? []).map((e) => `${e.assetId}:${e.theirAssetTitle}`));
+      const filtered = offeringEntries.filter((e) => !seekingKeys.has(`${e.assetId}:${e.theirAssetTitle}`));
+      if (filtered.length === 0) userOffering.delete(uid);
+      else userOffering.set(uid, filtered);
+    }
+
     const allUserIds = new Set([...userSeeking.keys(), ...userOffering.keys()]);
     const emailPromises = [...allUserIds].map((userId) => {
       const user = userMap.get(userId);
