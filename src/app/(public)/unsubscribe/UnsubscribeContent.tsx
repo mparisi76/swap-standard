@@ -21,9 +21,17 @@ export default function UnsubscribeContent() {
         </div>
         <div className="px-8 py-8 space-y-4">
           {success && (
-            <p className="text-body text-zinc-600 leading-relaxed">
-              You've been unsubscribed from SwapStandard email notifications. You won't receive match or trade alerts going forward.
-            </p>
+            <>
+              <p className="text-body text-zinc-600 leading-relaxed">
+                You've been unsubscribed from SwapStandard email notifications. You won't receive match or trade alerts going forward.
+              </p>
+              <p className="text-label text-zinc-500">
+                Changed your mind?{" "}
+                <Link href="/dashboard/settings" className="font-black text-zinc-900 underline underline-offset-2 hover:text-emerald-700 transition-colors">
+                  Re-enable in Settings →
+                </Link>
+              </p>
+            </>
           )}
           {error && (
             <p className="text-body text-zinc-600 leading-relaxed">

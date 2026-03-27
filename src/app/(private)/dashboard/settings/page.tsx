@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { getValidToken } from "@/lib/auth";
 import ProfileForm from "./ProfileForm";
 import PasswordForm from "./PasswordForm";
+import NotificationsForm from "./NotificationsForm";
 
 export const metadata: Metadata = {
   title: "Settings | SwapStandard",
@@ -13,13 +14,13 @@ export const metadata: Metadata = {
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 async function getMe(token: string) {
-  const res = await fetch(`${BASE_URL}/users/me?fields=first_name,last_name,handle,email`, {
+  const res = await fetch(`${BASE_URL}/users/me?fields=first_name,last_name,handle,email,email_unsubscribed`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
   if (!res.ok) return null;
   const { data } = await res.json();
-  return data as { first_name: string; last_name: string; handle: string; email: string };
+  return data as { first_name: string; last_name: string; handle: string; email: string; email_unsubscribed: boolean };
 }
 
 export default async function SettingsPage() {
@@ -64,6 +65,19 @@ export default async function SettingsPage() {
             handle={user.handle ?? ""}
             email={user.email}
           />
+        </section>
+
+        {/* Notifications */}
+        <section>
+          <header className="border-b-4 border-zinc-900 pb-6 mb-8">
+            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-2">
+              Preferences
+            </span>
+            <h1 className="text-header font-black uppercase italic text-zinc-900 leading-tight">
+              Notifications
+            </h1>
+          </header>
+          <NotificationsForm unsubscribed={user.email_unsubscribed ?? false} />
         </section>
 
         {/* Password */}
