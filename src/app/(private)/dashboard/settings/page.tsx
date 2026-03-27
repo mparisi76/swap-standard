@@ -14,13 +14,13 @@ export const metadata: Metadata = {
 const BASE_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 async function getMe(token: string) {
-  const res = await fetch(`${BASE_URL}/users/me?fields=first_name,last_name,handle,email,email_unsubscribed`, {
+  const res = await fetch(`${BASE_URL}/users/me?fields=first_name,last_name,handle,email,notify_matches,notify_messages,notify_activity`, {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
   if (!res.ok) return null;
   const { data } = await res.json();
-  return data as { first_name: string; last_name: string; handle: string; email: string; email_unsubscribed: boolean };
+  return data as { first_name: string; last_name: string; handle: string; email: string; notify_matches: boolean; notify_messages: boolean; notify_activity: boolean };
 }
 
 export default async function SettingsPage() {
@@ -77,7 +77,11 @@ export default async function SettingsPage() {
               Notifications
             </h1>
           </header>
-          <NotificationsForm unsubscribed={user.email_unsubscribed ?? false} />
+          <NotificationsForm
+            notifyMatches={user.notify_matches ?? true}
+            notifyMessages={user.notify_messages ?? true}
+            notifyActivity={user.notify_activity ?? true}
+          />
         </section>
 
         {/* Password */}

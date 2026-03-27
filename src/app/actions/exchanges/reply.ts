@@ -55,7 +55,7 @@ export async function replyAction(
   // Send email notification to counterparty (fire and forget)
   try {
     const exRes = await fetch(
-      `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=asset.title,initiator.id,initiator.first_name,initiator.last_name,initiator.email,owner.id,owner.first_name,owner.last_name,owner.email&limit=1`,
+      `${BASE_URL}/items/exchanges?filter[id][_eq]=${exchangeId}&fields=asset.title,initiator.id,initiator.first_name,initiator.last_name,initiator.email,initiator.email_unsubscribed,initiator.notify_messages,owner.id,owner.first_name,owner.last_name,owner.email,owner.email_unsubscribed,owner.notify_messages&limit=1`,
       { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
     );
     if (exRes.ok) {

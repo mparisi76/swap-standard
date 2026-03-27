@@ -10,15 +10,17 @@ export async function updateNotificationsAction(formData: FormData) {
   const auth = await getValidTokenWithUser();
   if (!auth) return;
 
-  const unsubscribed = formData.get("email_unsubscribed") !== "on";
-
   await fetch(`${BASE_URL}/users/${auth.userId}`, {
     method: "PATCH",
     headers: {
       Authorization: `Bearer ${STATIC_TOKEN}`,
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ email_unsubscribed: unsubscribed }),
+    body: JSON.stringify({
+      notify_matches:  formData.get("notify_matches")  === "true",
+      notify_messages: formData.get("notify_messages") === "true",
+      notify_activity: formData.get("notify_activity") === "true",
+    }),
   });
 
   revalidatePath("/dashboard/settings");

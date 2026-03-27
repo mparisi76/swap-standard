@@ -214,7 +214,7 @@ export async function POST(req: NextRequest) {
     const userIds = [...new Set(newCycles.flatMap((c) => [c.user_a, c.user_b, c.user_c]))];
 
     const usersRes = await fetch(
-      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name,email_unsubscribed`,
+      `${BASE_URL}/users?filter[id][_in]=${userIds.join(",")}&fields=id,email,first_name,email_unsubscribed,notify_matches`,
       { headers: { Authorization: `Bearer ${STATIC_TOKEN}` } },
     );
 
@@ -222,7 +222,7 @@ export async function POST(req: NextRequest) {
     if (usersRes.ok) {
       const { data: users } = await usersRes.json();
       for (const u of users) {
-        if (!u.email_unsubscribed) userMap.set(u.id, { email: u.email, first_name: u.first_name });
+        if (!u.email_unsubscribed && u.notify_matches !== false) userMap.set(u.id, { email: u.email, first_name: u.first_name });
       }
     }
 
