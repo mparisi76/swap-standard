@@ -7,6 +7,7 @@ import { type Exchange, type ExchangeMessage } from "@/types/schema";
 import StatusActions from "./StatusActions";
 import ReplyForm from "./ReplyForm";
 import AutoRefresh from "./AutoRefresh";
+import LocalTime from "./LocalTime";
 
 export const dynamic = "force-dynamic";
 
@@ -205,7 +206,7 @@ export default async function ExchangeThreadPage({
                             {isMe ? "You" : memberName(msg.sender)}
                           </span>
                           <span className="font-mono text-detail text-zinc-500">
-                            {new Date(msg.date_created).toLocaleString()}
+                            <LocalTime iso={msg.date_created} />
                           </span>
                         </div>
                         <p className="text-body leading-relaxed whitespace-pre-wrap text-zinc-800">{msg.content}</p>
