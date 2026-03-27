@@ -221,6 +221,49 @@ export async function sendPasswordResetEmail({ to, firstName, token }: PasswordR
   });
 }
 
+export interface ExchangeMessageEmailData {
+  to: string;
+  userId: string;
+  firstName: string | null;
+  senderName: string;
+  assetTitle: string;
+  exchangeId: number;
+  messagePreview: string;
+}
+
+export async function sendExchangeMessageNotification({
+  to, userId, firstName, senderName, assetTitle, exchangeId, messagePreview,
+}: ExchangeMessageEmailData) {
+  const name = firstName ?? "Member";
+  const truncated = messagePreview.length > 200 ? messagePreview.slice(0, 200) + "…" : messagePreview;
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      <strong>${senderName}</strong> sent you a message about <strong>${assetTitle}</strong>.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:2px solid #18181b;margin-bottom:24px">
+      <tr>
+        <td style="padding:16px;background:#f4f4f5;border-bottom:2px solid #18181b">
+          <p style="margin:0;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">${senderName}</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px;background:#fff">
+          <p style="margin:0;font-size:13px;color:#18181b;line-height:1.6;white-space:pre-wrap">${truncated}</p>
+        </td>
+      </tr>
+    </table>
+    <a href="${SITE_URL}/dashboard/exchanges/${exchangeId}" style="display:inline-block;background:#18181b;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;text-decoration:none">Reply →</a>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `New message from ${senderName} — ${assetTitle}`,
+    html: baseTemplate("New Message", body, unsubscribeUrl(userId)),
+  });
+}
+
 export interface ChainTradeEmailData {
   to: string;
   userId: string;
