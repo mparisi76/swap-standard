@@ -102,11 +102,12 @@ export async function updateExchangeStatusAction(
         // Fetch counterparty's notification prefs directly — relational expansion
         // on directus_users custom fields is unreliable
         const cpRes = await fetch(
-          `${BASE_URL}/users/${counterparty.id}?fields=email,email_unsubscribed,notify_activity`,
+          `${BASE_URL}/users?filter[id][_eq]=${counterparty.id}&fields=email,email_unsubscribed,notify_activity&limit=1`,
           { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
         );
         if (cpRes.ok) {
-          const { data: cp } = await cpRes.json();
+          const { data: cpList } = await cpRes.json();
+          const cp = cpList?.[0];
           if (cp?.email && !cp.email_unsubscribed && cp.notify_activity !== false) {
             await sendExchangeStatusNotification({
               to: cp.email,
