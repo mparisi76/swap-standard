@@ -59,9 +59,9 @@ export default function Footer() {
 
           {/* Ethos */}
           <div>
-            <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-4">
+            {/* <span className="text-label font-black uppercase tracking-[0.3em] text-zinc-500 block mb-4">
               Duty of Care
-            </span>
+            </span> */}
             <p className="text-detail text-zinc-500 leading-relaxed italic">
               &ldquo;The strength of a community is measured by what its members share, not what they own.&rdquo;
             </p>
