@@ -100,11 +100,15 @@ export default async function AssetDetailPage({
     "@type": "Product",
     name: asset.title,
     description: asset.offering ?? undefined,
-    ...(asset.thumbnail && {
-      image: `${DIRECTUS_URL}/assets/${asset.thumbnail}?width=1200&height=630&fit=cover`,
-    }),
+    image: asset.thumbnail
+      ? `${DIRECTUS_URL}/assets/${asset.thumbnail}?width=1200&height=630&fit=cover`
+      : `${siteUrl}/opengraph-image.png`,
     url: `${siteUrl}/explore/${asset.id}`,
     datePublished: asset.date_created,
+    brand: {
+      "@type": "Brand",
+      name: "SwapStandard",
+    },
     offers: {
       "@type": "Offer",
       availability: asset.asset_status === "available"
@@ -112,6 +116,20 @@ export default async function AssetDetailPage({
         : "https://schema.org/OutOfStock",
       price: "0",
       priceCurrency: "USD",
+      hasMerchantReturnPolicy: {
+        "@type": "MerchantReturnPolicy",
+        applicableCountry: "US",
+        returnPolicyCategory: "https://schema.org/MerchantReturnNotPermitted",
+      },
+      shippingDetails: {
+        "@type": "OfferShippingDetails",
+        shippingRate: {
+          "@type": "MonetaryAmount",
+          value: "0",
+          currency: "USD",
+        },
+        doesNotShip: true,
+      },
     },
   };
 
