@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import { useState, useRef, useEffect, Suspense } from "react";
@@ -8,6 +9,8 @@ import { ChevronDown, Settings, LogOut, Menu, X, Flag } from "lucide-react";
 import TextScaler from "./TextScaler";
 import LocationPill from "./LocationPill";
 import { logoutAction } from "@/app/actions/auth/logout";
+import { getUserLocation } from "@/utils/location-storage";
+import { DEFAULT_RADIUS_MILES } from "@/lib/constants";
 
 interface User {
   name?: string;
@@ -23,6 +26,14 @@ export default function Header({ user }: { user?: User | null }) {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const profileOpen = isProfileOpen && openedOnPathname === pathname;
+  const [exploreHref, setExploreHref] = useState("/explore");
+
+  useEffect(() => {
+    const loc = getUserLocation();
+    if (loc) {
+      setExploreHref(`/explore?lat=${loc.lat}&lng=${loc.lng}&radius=${DEFAULT_RADIUS_MILES}&page=1`);
+    }
+  }, []);
   const mobileOpen = isMobileOpen && openedOnPathname === pathname;
 
   useEffect(() => {
@@ -72,7 +83,7 @@ export default function Header({ user }: { user?: User | null }) {
         {/* Desktop nav */}
         <div className="hidden md:flex gap-6 items-center text-label font-bold uppercase tracking-[0.2em] text-zinc-900">
           <Link
-            href="/explore"
+            href={exploreHref}
             className="hover:underline underline-offset-4 decoration-2"
           >
             Explore
@@ -174,7 +185,7 @@ export default function Header({ user }: { user?: User | null }) {
           >
             <div className="px-6 py-4 space-y-4">
               <Link
-                href="/explore"
+                href={exploreHref}
                 onClick={() => setIsMobileOpen(false)}
                 className="block text-body font-black uppercase tracking-widest text-zinc-900 py-2 border-b-2 border-zinc-100"
               >
