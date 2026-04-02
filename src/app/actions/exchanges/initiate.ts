@@ -3,6 +3,7 @@
 import { redirect } from "next/navigation";
 import { getValidTokenWithUser } from "@/lib/auth";
 import { isBot } from "@/utils/honeypot";
+import { sendExchangeInitiatedNotification } from "@/lib/email";
 
 export type ExchangeFormState = {
   error?: string;
@@ -89,6 +90,46 @@ export async function initiateExchangeAction(
   if (!msgRes.ok) {
     // Exchange was created — still redirect, message failure is non-critical
     console.error("Failed to create opening message for exchange", exchangeId);
+  }
+
+  // Notify owner (fire and forget)
+  try {
+    const ownerRes = await fetch(
+      `${BASE_URL}/users?filter[id][_eq]=${ownerId}&fields=email,first_name,last_name,email_unsubscribed,notify_activity&limit=1`,
+      { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
+    );
+    if (ownerRes.ok) {
+      const { data: ownerList } = await ownerRes.json();
+      const owner = ownerList?.[0];
+      if (owner?.email && !owner.email_unsubscribed && owner.notify_activity !== false) {
+        const initiatorRes = await fetch(
+          `${BASE_URL}/users?filter[id][_eq]=${userId}&fields=first_name,last_name&limit=1`,
+          { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
+        );
+        let initiatorName = "A member";
+        if (initiatorRes.ok) {
+          const { data: iList } = await initiatorRes.json();
+          const ini = iList?.[0];
+          if (ini) initiatorName = `${ini.first_name ?? ""} ${ini.last_name ?? ""}`.trim() || "A member";
+        }
+        const assetRes2 = await fetch(
+          `${BASE_URL}/items/assets/${assetId}?fields=title`,
+          { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
+        );
+        const assetTitle = assetRes2.ok ? ((await assetRes2.json()).data?.title ?? "your listing") : "your listing";
+        await sendExchangeInitiatedNotification({
+          to: owner.email,
+          userId: ownerId,
+          firstName: owner.first_name,
+          initiatorName,
+          assetTitle,
+          exchangeId,
+          messagePreview: message,
+        });
+      }
+    }
+  } catch {
+    // Don't fail the redirect if email sending fails
   }
 
   redirect(`/dashboard/exchanges/${exchangeId}`);

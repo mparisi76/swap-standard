@@ -310,6 +310,51 @@ export async function sendExchangeStatusNotification({
   });
 }
 
+export interface ExchangeInitiatedEmailData {
+  to: string;
+  userId: string;
+  firstName: string | null;
+  initiatorName: string;
+  assetTitle: string;
+  exchangeId: number;
+  messagePreview: string;
+}
+
+export async function sendExchangeInitiatedNotification({
+  to, userId, firstName, initiatorName, assetTitle, exchangeId, messagePreview,
+}: ExchangeInitiatedEmailData) {
+  const name = firstName ?? "Member";
+  const preview = messagePreview.length > 200 ? messagePreview.slice(0, 200) + "…" : messagePreview;
+
+  const body = `
+    <p style="margin:0 0 8px;font-size:14px;color:#18181b">Hey ${name},</p>
+    <p style="margin:0 0 24px;font-size:13px;color:#3f3f46;line-height:1.6">
+      <strong>${initiatorName}</strong> wants to make a trade for your listing.
+    </p>
+    <table width="100%" cellpadding="0" cellspacing="0" style="border:2px solid #18181b;margin-bottom:24px">
+      <tr>
+        <td style="padding:16px;background:#f4f4f5;border-bottom:2px solid #18181b">
+          <p style="margin:0 0 4px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">Your listing</p>
+          <p style="margin:0;font-size:14px;font-weight:900;text-transform:uppercase;color:#18181b">${assetTitle}</p>
+        </td>
+      </tr>
+      <tr>
+        <td style="padding:16px">
+          <p style="margin:0 0 4px;font-size:9px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;color:#71717a">Their message</p>
+          <p style="margin:0;font-size:13px;color:#3f3f46;line-height:1.6">${preview}</p>
+        </td>
+      </tr>
+    </table>
+    <a href="${SITE_URL}/dashboard/exchanges/${exchangeId}" style="display:inline-block;background:#18181b;color:#fff;font-size:10px;font-weight:900;text-transform:uppercase;letter-spacing:0.2em;padding:14px 28px;text-decoration:none">Accept or Decline →</a>`;
+
+  await resend.emails.send({
+    from: FROM,
+    to,
+    subject: `${initiatorName} wants to trade for "${assetTitle}"`,
+    html: baseTemplate("New Exchange Request", body, unsubscribeUrl(userId)),
+  });
+}
+
 export interface ChainTradeEmailData {
   to: string;
   userId: string;
