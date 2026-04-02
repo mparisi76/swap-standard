@@ -26,10 +26,10 @@ export default function FlagButton({
     <>
       <button
         onClick={() => setOpen(true)}
-        className="flex items-center gap-1.5 text-detail font-bold uppercase tracking-widest text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
+        title="Report this listing"
+        className="text-zinc-400 hover:text-red-600 transition-colors cursor-pointer"
       >
-        <Flag size={11} />
-        Report this listing
+        <Flag size={18} strokeWidth={2} />
       </button>
 
       {open && (

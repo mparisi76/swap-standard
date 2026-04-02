@@ -11,6 +11,8 @@ import RecentViewTracker from "@/components/explore/RecentViewTracker";
 import RecentlyViewed from "@/components/explore/RecentlyViewed";
 import SimilarItems from "@/components/explore/SimilarItems";
 import MoreFromMember from "@/components/explore/MoreFromMember";
+import ShareButton from "./ShareButton";
+import SaveButton from "./SaveButton";
 
 import { Suspense } from "react";
 
@@ -94,6 +96,19 @@ export default async function AssetDetailPage({
   const isLoggedIn = !!auth;
   const isOwner = !!auth && asset.user_created === auth.userId;
 
+  // Check if current user has saved this asset
+  let isSaved = false;
+  if (auth) {
+    const saveRes = await fetch(
+      `${DIRECTUS_URL}/items/asset_saves?filter[user_created][_eq]=${auth.userId}&filter[asset][_eq]=${id}&limit=1&fields=id`,
+      { headers: { Authorization: `Bearer ${process.env.DIRECTUS_STATIC_TOKEN!}` }, cache: "no-store" },
+    );
+    if (saveRes.ok) {
+      const { data } = await saveRes.json();
+      isSaved = data?.length > 0;
+    }
+  }
+
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com";
   const jsonLd = {
     "@context": "https://schema.org",
@@ -174,16 +189,23 @@ export default async function AssetDetailPage({
 
           <div className="md:col-span-7 space-y-10">
             <header>
-              <div className="flex items-center gap-3 mb-2">
-                <span className="text-label font-black uppercase text-emerald-700 tracking-[0.2em]">
-                  {asset.asset_status || "Available"}
-                </span>
-                {asset.featured_until && new Date(asset.featured_until) > new Date() && (
-                  <span className="flex items-center gap-1 text-label font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
-                    <Star size={9} fill="currentColor" strokeWidth={0} />
-                    Featured
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-3">
+                  <span className="text-label font-black uppercase text-emerald-700 tracking-[0.2em]">
+                    {asset.asset_status || "Available"}
                   </span>
-                )}
+                  {asset.featured_until && new Date(asset.featured_until) > new Date() && (
+                    <span className="flex items-center gap-1 text-label font-black uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5">
+                      <Star size={9} fill="currentColor" strokeWidth={0} />
+                      Featured
+                    </span>
+                  )}
+                </div>
+                <div className="flex items-center gap-5">
+                  <SaveButton assetId={asset.id} initialSaved={isSaved} isLoggedIn={isLoggedIn} />
+                  <ShareButton url={`${siteUrl}/explore/${asset.id}`} title={asset.title} />
+                  {!isOwner && <FlagButton assetId={asset.id} assetTitle={asset.title} />}
+                </div>
               </div>
               <h1 className="text-header font-black uppercase italic leading-tight text-zinc-900 border-b-4 border-zinc-900 pb-6">
                 {asset.title}
@@ -259,12 +281,6 @@ export default async function AssetDetailPage({
                 </Link>
               )}
             </div>
-
-            {!isOwner && (
-              <div className="pt-2">
-                <FlagButton assetId={asset.id} assetTitle={asset.title} />
-              </div>
-            )}
 
           </div>
         </div>

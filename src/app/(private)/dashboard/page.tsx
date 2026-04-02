@@ -3,7 +3,7 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { getValidTokenWithUser } from "@/lib/auth";
 import { Asset, Exchange, ExchangeStatus, DirectMatch, DirectMatchAsset, ChainTrade, ChainTradeAsset } from "@/types/schema";
-import { Plus, Globe, ArrowLeftRight, Zap } from "lucide-react";
+import { Plus, Globe, ArrowLeftRight, Zap, Heart } from "lucide-react";
 import { formatDate } from "@/utils/date";
 import ListingsTable from "@/components/dashboard/ListingsTable";
 import ChainTradeRow from "@/components/dashboard/ChainTradeRow";
@@ -161,8 +161,8 @@ export default async function DashboardPage() {
           </h1>
         </header>
 
-        {/* Quick actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
+        {/* Actions */}
+        <div className="grid grid-cols-2 gap-4 md:gap-6">
           <Link
             href="/dashboard/asset/new"
             className="border-4 border-zinc-900 p-6 md:p-8 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
@@ -174,6 +174,20 @@ export default async function DashboardPage() {
             </p>
           </Link>
 
+          <Link
+            href="/dashboard/saved"
+            className="border-4 border-zinc-900 p-6 md:p-8 bg-white text-zinc-900 hover:bg-zinc-900 hover:text-white transition-all group shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]"
+          >
+            <Heart size={20} className="mb-3 text-red-500 group-hover:text-white transition-colors" />
+            <h2 className="text-body font-black uppercase">Saved</h2>
+            <p className="text-detail uppercase mt-1 font-bold opacity-60">
+              Your saved listings
+            </p>
+          </Link>
+        </div>
+
+        {/* Stats */}
+        <div className="grid grid-cols-2 md:grid-cols-3 gap-4 md:gap-6">
           <div className="border-4 border-zinc-900 p-6 md:p-8 bg-white">
             <Globe size={20} className="mb-3 text-zinc-500" />
             <h2 className="text-body font-black uppercase text-zinc-900">Listings</h2>
