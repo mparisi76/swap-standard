@@ -60,9 +60,9 @@ export default function Header({ user }: { user?: User | null }) {
   return (
     <motion.header
       style={{ borderBottomWidth: 4 }}
-      className="sticky top-0 z-50 bg-[#F9F8F6]/90 backdrop-blur-md border-zinc-900"
+      className="sticky top-0 z-50 bg-[#F9F8F6]/90 backdrop-blur-md border-zinc-900 h-[76px]"
     >
-      <nav className="px-6 py-4 flex items-center justify-between h-full">
+      <nav className="px-6 flex items-center justify-between h-full">
         {/* Logo */}
         <Link
           href="/"

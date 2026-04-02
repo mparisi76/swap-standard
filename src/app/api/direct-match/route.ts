@@ -79,15 +79,27 @@ export async function POST(req: NextRequest) {
     });
   }
 
-  // 2. Fetch existing matches to deduplicate
+  // 2. Fetch existing matches to deduplicate + clean up orphans
   const existingRes = await fetch(
-    `${BASE_URL}/items/direct_matches?filter[match_status][_eq]=suggested&fields=asset_a,asset_b&limit=-1`,
+    `${BASE_URL}/items/direct_matches?fields=id,asset_a,asset_b&limit=-1`,
     { headers: { Authorization: `Bearer ${STATIC_TOKEN}` }, cache: "no-store" },
   );
   const existingKeys = new Set<string>();
   if (existingRes.ok) {
-    const { data: existing }: { data: { asset_a: number; asset_b: number }[] } = await existingRes.json();
-    for (const row of existing) existingKeys.add(matchKey(row.asset_a, row.asset_b));
+    const { data: existing }: { data: { id: number; asset_a: number; asset_b: number }[] } = await existingRes.json();
+    const liveAssetIds = new Set(allReal.map((a) => a.id));
+    const orphanIds = existing.filter((r) => !liveAssetIds.has(r.asset_a) || !liveAssetIds.has(r.asset_b)).map((r) => r.id);
+    if (orphanIds.length > 0) {
+      await fetch(`${BASE_URL}/items/direct_matches`, {
+        method: "DELETE",
+        headers: { Authorization: `Bearer ${STATIC_TOKEN}`, "Content-Type": "application/json" },
+        body: JSON.stringify({ keys: orphanIds }),
+      });
+      console.log(`[direct-match] deleted ${orphanIds.length} orphaned matches`);
+    }
+    for (const row of existing) {
+      if (!orphanIds.includes(row.id)) existingKeys.add(matchKey(row.asset_a, row.asset_b));
+    }
   }
 
   // 3. Build offering index
