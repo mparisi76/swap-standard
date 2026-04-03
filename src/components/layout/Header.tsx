@@ -89,6 +89,12 @@ export default function Header({ user }: { user?: User | null }) {
             Explore
           </Link>
           <Link
+            href="/how-it-works"
+            className="hover:underline underline-offset-4 decoration-2"
+          >
+            How It Works
+          </Link>
+          <Link
             href="/dashboard"
             className="px-6 py-3 bg-zinc-900 text-white hover:bg-emerald-700 transition-all text-label"
           >
@@ -190,6 +196,13 @@ export default function Header({ user }: { user?: User | null }) {
                 className="block text-body font-black uppercase tracking-widest text-zinc-900 py-2 border-b-2 border-zinc-100"
               >
                 Explore
+              </Link>
+              <Link
+                href="/how-it-works"
+                onClick={() => setIsMobileOpen(false)}
+                className="block text-body font-black uppercase tracking-widest text-zinc-900 py-2 border-b-2 border-zinc-100"
+              >
+                How It Works
               </Link>
               <Link
                 href="/dashboard"
