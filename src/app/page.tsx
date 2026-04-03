@@ -6,13 +6,13 @@ import AnimatedSection from "@/components/layout/AnimatedSection";
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 export const metadata: Metadata = {
-  title: "SwapStandard — Keep Good Things in Use",
+  title: "SwapStandard — The Standard for Swapping Goods and Services",
   description:
-    "The things we no longer need still hold immense value for someone else. A space for direct, person-to-person exchange — no middleman, no unnecessary costs.",
+    "The standard for swapping goods and services. A community barter registry built on a duty of care to our earth and one another.",
   openGraph: {
-    title: "SwapStandard — Keep Good Things in Use",
+    title: "SwapStandard — The Standard for Swapping Goods and Services",
     description:
-      "No middleman, no unnecessary costs. Direct exchange that keeps good items in use and helps neighbors thrive.",
+      "The standard for swapping goods and services. Direct person-to-person exchange — no middleman, no unnecessary costs.",
     url: process.env.NEXT_PUBLIC_SITE_URL ?? "https://swapstandard.com",
   },
 };
@@ -31,6 +31,42 @@ async function getCount(filter: Record<string, unknown>): Promise<number> {
   return json?.meta?.filter_count ?? 0;
 }
 
+const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://www.swapstandard.com";
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": `${SITE_URL}/#organization`,
+      name: "SwapStandard",
+      url: SITE_URL,
+      description:
+        "The standard for swapping goods and services. A community barter registry built on a duty of care to our earth and one another.",
+      contactPoint: {
+        "@type": "ContactPoint",
+        email: "swapstandard@gmail.com",
+        contactType: "customer support",
+      },
+    },
+    {
+      "@type": "WebSite",
+      "@id": `${SITE_URL}/#website`,
+      url: SITE_URL,
+      name: "SwapStandard",
+      publisher: { "@id": `${SITE_URL}/#organization` },
+      potentialAction: {
+        "@type": "SearchAction",
+        target: {
+          "@type": "EntryPoint",
+          urlTemplate: `${SITE_URL}/explore?search={search_term_string}`,
+        },
+        "query-input": "required name=search_term_string",
+      },
+    },
+  ],
+};
+
 export default async function HomePage() {
   const [sharedCount, seekingCount] = await Promise.all([
     getCount({ _and: [{ status: { _eq: "published" } }, { offering: { _nnull: true } }] }),
@@ -38,6 +74,11 @@ export default async function HomePage() {
   ]);
 
   return (
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
     <main className="min-h-[calc(100vh-80px)] bg-[#F9F8F6] py-20 px-6 font-serif">
       <div className="max-w-3xl mx-auto">
         <AnimatedSection delay={0.1}>
@@ -147,5 +188,6 @@ export default async function HomePage() {
         </AnimatedSection>
       </div>
     </main>
+    </>
   );
 }
