@@ -101,35 +101,36 @@ export async function registerAction(
     const token = generateVerificationToken(email);
     const verifyUrl = `${siteUrl}/verify-email?token=${token}`;
 
-    // Send verification email to new user
-    fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "SwapStandard <noreply@swapstandard.com>",
-        to: email,
-        subject: "Verify your SwapStandard account",
-        text: `Hi ${firstName},\n\nVerify your email to activate your SwapStandard account:\n\n${verifyUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can ignore this email.\n\n— SwapStandard`,
+    await Promise.allSettled([
+      // Send verification email to new user
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "SwapStandard <noreply@swapstandard.com>",
+          to: email,
+          subject: "Verify your SwapStandard account",
+          text: `Hi ${firstName},\n\nVerify your email to activate your SwapStandard account:\n\n${verifyUrl}\n\nThis link expires in 24 hours.\n\nIf you didn't create an account, you can ignore this email.\n\n— SwapStandard`,
+        }),
       }),
-    }).catch(() => {});
-
-    // Notify admin of new signup
-    fetch("https://api.resend.com/emails", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${resendKey}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        from: "SwapStandard <noreply@swapstandard.com>",
-        to: "swapstandard@gmail.com",
-        subject: "New member signup",
-        text: `New member registered on SwapStandard.\n\nName: ${firstName} ${lastName}\nHandle: ${handle || "—"}\nEmail: ${email}\n`,
+      // Notify admin of new signup
+      fetch("https://api.resend.com/emails", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${resendKey}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          from: "SwapStandard <noreply@swapstandard.com>",
+          to: "swapstandard@gmail.com",
+          subject: "New member signup",
+          text: `New member registered on SwapStandard.\n\nName: ${firstName} ${lastName}\nHandle: ${handle || "—"}\nEmail: ${email}\n`,
+        }),
       }),
-    }).catch(() => {});
+    ]);
   }
 
   redirect("/login?registered=true");
