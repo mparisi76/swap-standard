@@ -18,6 +18,8 @@ import { Suspense } from "react";
 
 import { getValidTokenWithUser } from "@/lib/auth";
 
+export const revalidate = 86400;
+
 const DIRECTUS_URL = process.env.NEXT_PUBLIC_DIRECTUS_URL!;
 
 const FIELDS = [
