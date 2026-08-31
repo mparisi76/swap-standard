@@ -9,6 +9,7 @@ const securityHeaders = [
 ];
 
 const nextConfig: NextConfig = {
+  output: "standalone", // Generates a lightweight production build (~100MB)
   reactStrictMode: true,
   poweredByHeader: false,
   experimental: {
